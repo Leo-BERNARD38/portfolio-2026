@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Léo BERNARD — Web Developer & UX-UI Designer</title>
+    <meta name="description" content="Portfolio de Léo BERNARD. Développeur web et designer UX/UI basé à Lyon. Création d'expériences digitales centrées sur l'humain.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/styles/main.css">
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader__content">
+            <div class="loader__logo">
+                <span class="loader__logo-text">LB</span>
+                <span class="loader__logo-dot"></span>
+            </div>
+            <div class="loader__progress">
+                <div class="loader__progress-bar"></div>
+            </div>
+            <span class="loader__text mono-text">Loading experience...</span>
+        </div>
+    </div>
+
+    <!-- Cursor Custom -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="nav__logo">
+                <span class="nav__logo-text">LB</span>
+                <span class="nav__logo-dot"></span>
+            </div>
+            <ul class="nav__links">
+                <li><a href="#work" class="nav__link" data-text="Projets">Projets</a></li>
+                <li><a href="#about" class="nav__link" data-text="À propos">À propos</a></li>
+                <li><a href="#services" class="nav__link" data-text="Services">Services</a></li>
+                <li><a href="#contact" class="nav__link nav__link--cta">Discutons</a></li>
+            </ul>
+            <button class="nav__menu-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero__grid">
+            <div class="hero__content">
+                <p class="hero__label mono-text">
+                    <span class="hero__label-number">01</span>
+                    Web Developer & UX-UI Designer
+                </p>
+                <h1 class="hero__title">
+                    La tech au service<br>
+                    de <em>l'humain</em>
+                </h1>
+                <p class="hero__subtitle">
+                    Je transforme des idées complexes en expériences digitales 
+                    intuitives. Code créatif, design réfléchi, résultats concrets.
+                </p>
+                <div class="hero__cta">
+                    <a href="#work" class="btn btn--primary">
+                        <span>Voir les projets</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </a>
+                    <a href="assets/files/CV_BERNARD_Leo_2025.pdf" target="_blank" class="btn btn--secondary">Télécharger CV</a>
+                </div>
+            </div>
+            <div class="hero__visual">
+                <div class="hero__image-wrapper">
+                    <div class="hero__image-placeholder">
+                        <span class="mono-text">PORTRAIT.IMG</span>
+                    </div>
+                </div>
+                <div class="hero__stats">
+                    <div class="stat">
+                        <span class="stat__number">3+</span>
+                        <span class="stat__label mono-text">Années XP</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat__number">M2</span>
+                        <span class="stat__label mono-text">Design & Dev</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero__scroll">
+            <span class="mono-text">Scroll</span>
+            <div class="hero__scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Marquee -->
+    <div class="marquee">
+        <div class="marquee__track">
+            <span class="marquee__item">UI Design</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">UX Research</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Creative Dev</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Motion Design</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Brand Identity</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">UI Design</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">UX Research</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Creative Dev</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Motion Design</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Brand Identity</span>
+            <span class="marquee__separator">◆</span>
+        </div>
+    </div>
+
+    <!-- Work Section - Bento Grid -->
+    <section id="work" class="work">
+        <div class="section-header">
+            <div class="section-header__label">
+                <span class="mono-text">02</span>
+                <span class="mono-text">SELECTED WORK</span>
+            </div>
+            <h2 class="section-header__title">Projets <em>sélectionnés</em></h2>
+        </div>
+
+        <div class="bento-grid">
+            <!-- Project 1 - Large : OptiWITS -->
+            <article class="bento-item bento-item--large" data-project="optiwits">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <div class="bento-item__placeholder">
+                            <span class="mono-text">OPTIWITS.JPG</span>
+                        </div>
+                        <div class="bento-item__overlay"></div>
+                    </div>
+                    <div class="bento-item__content">
+                        <div class="bento-item__tags">
+                            <span class="tag mono-text">SAAS</span>
+                            <span class="tag mono-text">UX/UI</span>
+                            <span class="tag mono-text">FULL-STACK</span>
+                        </div>
+                        <h3 class="bento-item__title">OptiWITS™</h3>
+                        <p class="bento-item__desc">Plateforme SaaS d'optimisation de parcs éoliens. Refonte UX/UI complète et développement full-stack.</p>
+                        <span class="bento-item__year mono-text">2025</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 2 - Medium : Camping-Car Partner -->
+            <article class="bento-item bento-item--medium" data-project="ccp">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <div class="bento-item__placeholder">
+                            <span class="mono-text">CCP.JPG</span>
+                        </div>
+                        <div class="bento-item__overlay"></div>
+                    </div>
+                    <div class="bento-item__content">
+                        <div class="bento-item__tags">
+                            <span class="tag mono-text">B2B</span>
+                            <span class="tag mono-text">CRM</span>
+                            <span class="tag mono-text">PHP</span>
+                        </div>
+                        <h3 class="bento-item__title">Camping-Car Partner</h3>
+                        <p class="bento-item__desc">Extranet B2B avec CRM intégré, développé en solo</p>
+                        <span class="bento-item__year mono-text">2023 — 2024</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 3 - Medium : YouTube -->
+            <article class="bento-item bento-item--medium" data-project="youtube">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <div class="bento-item__placeholder">
+                            <span class="mono-text">YOUTUBE.JPG</span>
+                        </div>
+                        <div class="bento-item__overlay"></div>
+                    </div>
+                    <div class="bento-item__content">
+                        <div class="bento-item__tags">
+                            <span class="tag mono-text">MOTION</span>
+                            <span class="tag mono-text">AFTER EFFECTS</span>
+                        </div>
+                        <h3 class="bento-item__title">YouTube @WNT</h3>
+                        <p class="bento-item__desc">Création de contenu, montage & VFX</p>
+                        <span class="bento-item__year mono-text">2016 — ...</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 4 - Small : Portfolio -->
+            <article class="bento-item bento-item--small" data-project="portfolio">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <div class="bento-item__placeholder">
+                            <span class="mono-text">FOLIO.JPG</span>
+                        </div>
+                        <div class="bento-item__overlay"></div>
+                    </div>
+                    <div class="bento-item__content">
+                        <h3 class="bento-item__title">Portfolio 2024</h3>
+                        <span class="bento-item__year mono-text">2024</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 5 - Small : Secret Project -->
+            <article class="bento-item bento-item--small" data-project="secret">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <div class="bento-item__placeholder">
+                            <span class="mono-text">SECRET.JPG</span>
+                        </div>
+                        <div class="bento-item__overlay"></div>
+                    </div>
+                    <div class="bento-item__content">
+                        <h3 class="bento-item__title">Projet Secret 🤫</h3>
+                        <span class="bento-item__year mono-text">2025</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 6 - Wide : Autres projets -->
+            <article class="bento-item bento-item--wide" data-project="others">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <div class="bento-item__placeholder">
+                            <span class="mono-text">MISC.JPG</span>
+                        </div>
+                        <div class="bento-item__overlay"></div>
+                    </div>
+                    <div class="bento-item__content">
+                        <div class="bento-item__tags">
+                            <span class="tag mono-text">REACT</span>
+                            <span class="tag mono-text">FIGMA</span>
+                            <span class="tag mono-text">THREE.JS</span>
+                        </div>
+                        <h3 class="bento-item__title">Autres Projets</h3>
+                        <p class="bento-item__desc">Projets académiques et personnels explorant diverses technologies créatives</p>
+                        <span class="bento-item__year mono-text">2022 — ...</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="about__grid">
+            <div class="about__image-col">
+                <div class="about__image-wrapper">
+                    <div class="about__image-placeholder">
+                        <span class="mono-text">LEO.JPG</span>
+                    </div>
+                </div>
+                <div class="about__badge">
+                    <span class="mono-text">OPEN TO WORK</span>
+                    <span class="about__badge-dot"></span>
+                </div>
+            </div>
+            <div class="about__content-col">
+                <div class="section-header section-header--left">
+                    <div class="section-header__label">
+                        <span class="mono-text">03</span>
+                        <span class="mono-text">À PROPOS</span>
+                    </div>
+                    <h2 class="section-header__title">
+                        Développeur avec une<br>
+                        <em>âme de designer</em>
+                    </h2>
+                </div>
+                <div class="about__text">
+                    <p>
+                        D'un bagage technique solide à une approche créative complète : 
+                        mon parcours illustre une conviction — la technologie n'est qu'un 
+                        moyen, l'expérience humaine est la finalité.
+                    </p>
+                    <p>
+                        Actuellement en Master 2 Conception et Intégration Multimédia 
+                        (spé. Direction Artistique) à Lyon 2, je combine rigueur du code 
+                        et sensibilité design pour créer des produits qui comptent vraiment.
+                    </p>
+                </div>
+                <div class="about__skills">
+                    <div class="skill-group">
+                        <h4 class="skill-group__title mono-text">DESIGN</h4>
+                        <ul class="skill-group__list">
+                            <li>UI/UX Design</li>
+                            <li>Direction Artistique</li>
+                            <li>Motion Design</li>
+                            <li>Figma Expert</li>
+                        </ul>
+                    </div>
+                    <div class="skill-group">
+                        <h4 class="skill-group__title mono-text">DEVELOPMENT</h4>
+                        <ul class="skill-group__list">
+                            <li>React / Angular</li>
+                            <li>PHP / Python</li>
+                            <li>Three.js / WebGL</li>
+                            <li>MySQL / MongoDB</li>
+                        </ul>
+                    </div>
+                    <div class="skill-group">
+                        <h4 class="skill-group__title mono-text">TOOLS</h4>
+                        <ul class="skill-group__list">
+                            <li>Suite Adobe</li>
+                            <li>Git / GitHub</li>
+                            <li>Blender</li>
+                            <li>VS Code</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="section-header">
+            <div class="section-header__label">
+                <span class="mono-text">04</span>
+                <span class="mono-text">SERVICES</span>
+            </div>
+            <h2 class="section-header__title">Ce que je <em>propose</em></h2>
+        </div>
+
+        <div class="services__grid">
+            <article class="service-card">
+                <div class="service-card__number mono-text">01</div>
+                <div class="service-card__icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9h18M9 21V9"/>
+                    </svg>
+                </div>
+                <h3 class="service-card__title">UI/UX Design</h3>
+                <p class="service-card__desc">
+                    Interfaces intuitives et esthétiques. Research, wireframes, 
+                    prototypes haute-fidélité et design systems.
+                </p>
+                <ul class="service-card__list mono-text">
+                    <li>User Research</li>
+                    <li>Wireframing</li>
+                    <li>Prototyping</li>
+                    <li>Design System</li>
+                </ul>
+            </article>
+
+            <article class="service-card">
+                <div class="service-card__number mono-text">02</div>
+                <div class="service-card__icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <h3 class="service-card__title">Creative Development</h3>
+                <p class="service-card__desc">
+                    Du design à la réalité. Développement front-end sur mesure 
+                    avec animations fluides et performances optimisées.
+                </p>
+                <ul class="service-card__list mono-text">
+                    <li>React / Next.js</li>
+                    <li>GSAP Animations</li>
+                    <li>WebGL / Three.js</li>
+                    <li>Performance</li>
+                </ul>
+            </article>
+
+            <article class="service-card">
+                <div class="service-card__number mono-text">03</div>
+                <div class="service-card__icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                </div>
+                <h3 class="service-card__title">Brand Identity</h3>
+                <p class="service-card__desc">
+                    Identités visuelles mémorables. Du logo à la charte graphique 
+                    complète, construisons votre univers de marque.
+                </p>
+                <ul class="service-card__list mono-text">
+                    <li>Logo Design</li>
+                    <li>Visual Identity</li>
+                    <li>Brand Guidelines</li>
+                    <li>Art Direction</li>
+                </ul>
+            </article>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="section-header">
+            <div class="section-header__label">
+                <span class="mono-text">05</span>
+                <span class="mono-text">TESTIMONIALS</span>
+            </div>
+            <h2 class="section-header__title">Ce qu'ils <em>disent</em></h2>
+        </div>
+
+        <div class="testimonials__slider">
+            <div class="testimonial">
+                <blockquote class="testimonial__quote">
+                    "Léo a su transformer notre vision en une plateforme SaaS 
+                    performante et intuitive. Autonome, créatif et rigoureux."
+                </blockquote>
+                <div class="testimonial__author">
+                    <div class="testimonial__avatar"></div>
+                    <div class="testimonial__info">
+                        <span class="testimonial__name">GreenWITS</span>
+                        <span class="testimonial__role mono-text">STAGE M2 — 2025</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="contact__wrapper">
+            <div class="section-header section-header--center">
+                <div class="section-header__label">
+                    <span class="mono-text">06</span>
+                    <span class="mono-text">CONTACT</span>
+                </div>
+                <h2 class="contact__title">
+                    Une idée, un projet ?<br>
+                    <em>Discutons</em>
+                </h2>
+                <p class="contact__subtitle">
+                    Disponible pour stages, alternances et opportunités.
+                    <br>Réponse sous 24h garantie.
+                </p>
+            </div>
+
+            <div class="contact__cta">
+                <a href="mailto:leobernard712@gmail.com" class="btn btn--large">
+                    <span>leobernard712@gmail.com</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="contact__socials">
+                <a href="https://www.linkedin.com/in/léo-bernard-wnt/" target="_blank" class="social-link" aria-label="LinkedIn">
+                    <span class="mono-text">LINKEDIN</span>
+                </a>
+                <a href="https://github.com/Leo-BERNARD38" target="_blank" class="social-link" aria-label="GitHub">
+                    <span class="mono-text">GITHUB</span>
+                </a>
+                <a href="https://www.youtube.com/@WNT_38" target="_blank" class="social-link" aria-label="YouTube">
+                    <span class="mono-text">YOUTUBE</span>
+                </a>
+                <a href="tel:+33674359867" class="social-link" aria-label="Téléphone">
+                    <span class="mono-text">06 74 35 98 67</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Modal -->
+    <div class="project-modal" id="projectModal">
+        <div class="project-modal__backdrop"></div>
+        <div class="project-modal__container">
+            <button class="project-modal__close" aria-label="Fermer">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+            
+            <div class="project-modal__content">
+                <div class="project-modal__header">
+                    <span class="project-modal__number mono-text">01</span>
+                    <div class="project-modal__tags"></div>
+                </div>
+                
+                <h2 class="project-modal__title"></h2>
+                <p class="project-modal__subtitle"></p>
+                
+                <div class="project-modal__image">
+                    <div class="project-modal__image-placeholder">
+                        <span class="mono-text">PROJECT.JPG</span>
+                    </div>
+                </div>
+                
+                <div class="project-modal__details">
+                    <div class="project-modal__info">
+                        <div class="project-modal__info-item">
+                            <span class="mono-text">ANNÉE</span>
+                            <p class="project-modal__year"></p>
+                        </div>
+                        <div class="project-modal__info-item">
+                            <span class="mono-text">RÔLE</span>
+                            <p class="project-modal__role"></p>
+                        </div>
+                        <div class="project-modal__info-item">
+                            <span class="mono-text">CONTEXTE</span>
+                            <p class="project-modal__context"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="project-modal__description"></div>
+                    
+                    <div class="project-modal__stack">
+                        <span class="mono-text">TECHNOLOGIES</span>
+                        <div class="project-modal__stack-list"></div>
+                    </div>
+                </div>
+                
+                <div class="project-modal__actions">
+                    <a href="#" class="btn btn--primary project-modal__link project-modal__link--site" target="_blank" style="display: none;">
+                        <span>Voir le site</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="btn btn--secondary project-modal__link project-modal__link--github" target="_blank" style="display: none;">
+                        <span>GitHub</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="project-modal__nav">
+                <button class="project-modal__nav-btn project-modal__nav-btn--prev" aria-label="Projet précédent">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span class="mono-text">PRÉCÉDENT</span>
+                </button>
+                <button class="project-modal__nav-btn project-modal__nav-btn--next" aria-label="Projet suivant">
+                    <span class="mono-text">SUIVANT</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__grid">
+            <div class="footer__col">
+                <span class="footer__logo">LB</span>
+                <p class="footer__tagline">Léo BERNARD</p>
+            </div>
+            <div class="footer__col">
+                <span class="footer__label mono-text">LOCATION</span>
+                <p>Lyon, France</p>
+                <p class="mono-text">UTC +1</p>
+            </div>
+            <div class="footer__col">
+                <span class="footer__label mono-text">NAVIGATION</span>
+                <nav class="footer__nav">
+                    <a href="#work">Projets</a>
+                    <a href="#about">À propos</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+            </div>
+            <div class="footer__col">
+                <span class="footer__label mono-text">RESSOURCES</span>
+                <nav class="footer__nav">
+                    <a href="assets/files/CV_BERNARD_Leo_2025.pdf" target="_blank">Télécharger CV</a>
+                    <a href="https://github.com/Leo-BERNARD38" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <span class="mono-text">© 2025 LÉO BERNARD — TOUS DROITS RÉSERVÉS</span>
+            <span class="mono-text">DÉVELOPPÉ AVEC ♥ & PASSION</span>
+        </div>
+    </footer>
+
+    <script src="assets/scripts/main.js"></script>
+</body>
+</html>
