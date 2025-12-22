@@ -33,8 +33,8 @@ function initLoader() {
     const MIN_LOADER_TIME = 2000;
     const loaderStartTime = Date.now();
     
-    let progress = 0;
     const progressBar = loader.querySelector('.loader__progress-bar');
+    let progress = progressBar ? parseInt(progressBar.style.width) || 0 : 0;
     
     const updateProgress = (value) => {
         progress = Math.min(value, 100);
@@ -44,6 +44,7 @@ function initLoader() {
     };
     
     const hideLoader = () => {
+        if (window.loaderInterval) clearInterval(window.loaderInterval);
         const elapsedTime = Date.now() - loaderStartTime;
         const remainingTime = Math.max(0, MIN_LOADER_TIME - elapsedTime);
         
@@ -76,7 +77,9 @@ function initLoader() {
     }, 5000);
     
     // Progress simulation
-    let simulatedProgress = 0;
+    if (window.loaderInterval) clearInterval(window.loaderInterval);
+    
+    let simulatedProgress = progress;
     const simulateProgress = setInterval(() => {
         const increment = Math.random() * 15;
         simulatedProgress += increment;

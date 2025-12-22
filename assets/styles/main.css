@@ -950,11 +950,10 @@ em {
     inset: 0;
     border-radius: 20px;
     padding: 1px;
-    background: linear-gradient(
-        135deg,
-        transparent 0%,
-        rgba(255, 77, 0, 0.4) 50%,
-        transparent 100%
+    background: radial-gradient(
+        600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(255, 77, 0, 0.6),
+        transparent 40%
     );
     -webkit-mask: 
         linear-gradient(#fff 0 0) content-box, 
@@ -967,6 +966,7 @@ em {
     opacity: 0;
     transition: opacity 0.5s ease;
     pointer-events: none;
+    z-index: 3;
 }
 
 .bento-item:hover::after {
@@ -1032,12 +1032,25 @@ em {
     flex-direction: column;
     height: 100%;
     min-height: 300px;
+    position: relative;
+    z-index: 2;
 }
 
 .bento-item__image {
     position: relative;
     flex: 1;
     overflow: hidden;
+}
+
+.bento-item__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease-out-expo);
+}
+
+.bento-item:hover .bento-item__image img {
+    transform: scale(1.05);
 }
 
 .bento-item__placeholder {
@@ -1201,6 +1214,17 @@ em {
     position: relative;
 }
 
+.about__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease-out-expo);
+}
+
+.about__image-wrapper:hover .about__img {
+    transform: scale(1.05);
+}
+
 .about__image-placeholder {
     width: 100%;
     height: 100%;
@@ -1323,7 +1347,6 @@ em {
     transition: all 0.6s var(--ease-out-expo);
     position: relative;
     overflow: hidden;
-    cursor: pointer;
 }
 
 /* Glow effect on hover */
@@ -1352,11 +1375,10 @@ em {
     inset: 0;
     border-radius: 24px;
     padding: 1px;
-    background: linear-gradient(
-        135deg,
-        transparent 0%,
-        rgba(255, 77, 0, 0.5) 50%,
-        transparent 100%
+    background: radial-gradient(
+        600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(255, 77, 0, 0.6),
+        transparent 40%
     );
     -webkit-mask: 
         linear-gradient(#fff 0 0) content-box, 
@@ -1369,6 +1391,7 @@ em {
     opacity: 0;
     transition: opacity 0.5s ease;
     pointer-events: none;
+    z-index: 2;
 }
 
 .service-card:hover::after {

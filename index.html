@@ -9,11 +9,11 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Georgia,serif' font-size='14' font-weight='600' fill='%23ffffff'%3ELB%3C/text%3E%3Ccircle cx='26' cy='8' r='3' fill='%23ff4d00'/%3E%3C/svg%3E">
     
-    <!-- Fonts -->
+    <!-- Fonts Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
     
+    <!-- Critical Loader Styles -->
     <style>
         :root {
             --color-bg: #0a0a0a;
@@ -23,11 +23,26 @@
             --font-display: 'Playfair Display', Georgia, serif;
             --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
             --space-lg: clamp(1.5rem, 1rem + 2vw, 3rem);
+            --text-xs: clamp(0.625rem, 0.5rem + 0.25vw, 0.75rem);
             --text-4xl: clamp(2.5rem, 1.5rem + 4vw, 5rem);
             --text-5xl: clamp(3rem, 2rem + 5vw, 7rem);
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
             --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
         }
+
+        body.loading {
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .mono-text {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
         .loader {
             position: fixed;
             inset: 0;
@@ -101,7 +116,14 @@
             100% { clip-path: inset(0 0 100% 0); }
         }
     </style>
-    <link rel="stylesheet" href="assets/styles/main.css">
+    <!-- Non-critical CSS (Loaded asynchronously) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="assets/styles/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="assets/styles/main.css">
+    </noscript>
+
     <script src="assets/scripts/main.js" defer></script>
 </head>
 <body class="loading">
@@ -121,6 +143,25 @@
             <span class="loader__text mono-text">Chargement...</span>
         </div>
     </div>
+
+    <script>
+        // Initialisation immédiate du loader pour éviter tout délai
+        (function() {
+            const progressBar = document.querySelector('.loader__progress-bar');
+            if (progressBar) {
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress > 85) {
+                        clearInterval(interval);
+                        progress = 85;
+                    }
+                    progressBar.style.width = progress + '%';
+                }, 100);
+                window.loaderInterval = interval;
+            }
+        })();
+    </script>
 
     <!-- Custom Cursor -->
     <div class="cursor"></div>
@@ -269,9 +310,7 @@
             <article class="bento-item bento-item--large" data-project="optiwits">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <div class="bento-item__placeholder">
-                            <span class="mono-text">OPTIWITS.JPG</span>
-                        </div>
+                        <img src="assets/images/optiwits.webp" alt="OptiWITS" loading="lazy">
                         <div class="bento-item__overlay"></div>
                         <div class="bento-item__arrow">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -296,9 +335,7 @@
             <article class="bento-item bento-item--medium" data-project="ccp">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <div class="bento-item__placeholder">
-                            <span class="mono-text">CCP.JPG</span>
-                        </div>
+                        <img src="assets/images/ccp.webp" alt="Camping-Car Partner" loading="lazy">
                         <div class="bento-item__overlay"></div>
                         <div class="bento-item__arrow">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -323,9 +360,7 @@
             <article class="bento-item bento-item--medium" data-project="modnation">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <div class="bento-item__placeholder">
-                            <span class="mono-text">MODNATION.JPG</span>
-                        </div>
+                        <img src="assets/images/modnation.webp" alt="ModNation" loading="lazy">
                         <div class="bento-item__overlay"></div>
                         <div class="bento-item__arrow">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -350,9 +385,7 @@
             <article class="bento-item bento-item--small" data-project="portfolio">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <div class="bento-item__placeholder">
-                            <span class="mono-text">FOLIO.JPG</span>
-                        </div>
+                        <img src="assets/images/portfolio.webp" alt="Portfolio" loading="lazy">
                         <div class="bento-item__overlay"></div>
                         <div class="bento-item__arrow">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -371,9 +404,7 @@
             <article class="bento-item bento-item--small" data-project="secret">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <div class="bento-item__placeholder">
-                            <span class="mono-text">SECRET.JPG</span>
-                        </div>
+                        <img src="assets/images/secret.webp" alt="Secret Project" loading="lazy">
                         <div class="bento-item__overlay"></div>
                         <div class="bento-item__arrow">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -392,9 +423,7 @@
             <article class="bento-item bento-item--wide" data-project="youtube">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <div class="bento-item__placeholder">
-                            <span class="mono-text">YOUTUBE.JPG</span>
-                        </div>
+                        <img src="assets/images/youtube.webp" alt="YouTube @WNT" loading="lazy">
                         <div class="bento-item__overlay"></div>
                         <div class="bento-item__arrow">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -422,9 +451,7 @@
         <div class="about__grid">
             <div class="about__image-col">
                 <div class="about__image-wrapper">
-                    <div class="about__image-placeholder">
-                        <span class="mono-text">LEO.JPG</span>
-                    </div>
+                    <img src="assets/images/profil.webp" alt="Léo BERNARD" class="about__img">
                 </div>
                 <div class="about__badge">
                     <span class="mono-text">OPEN TO WORK</span>
@@ -636,7 +663,7 @@
                 
                 <div class="project-modal__image">
                     <div class="project-modal__image-placeholder">
-                        <span class="mono-text">PROJECT.JPG</span>
+                        <span class="mono-text">PROJECT.WEBP</span>
                     </div>
                 </div>
                 
