@@ -185,6 +185,28 @@ ul, ol {
     }
 }
 
+/* Desktop: hide native cursor globally, enable pointer only on explicitly clickable elements */
+@media (hover: hover) and (pointer: fine) {
+    body {
+        cursor: none;
+    }
+
+    /* Elements that should show the native pointer (clickable) */
+    a,
+    button,
+    [role="button"],
+    input[type="button"],
+    input[type="submit"],
+    .bento-item,
+    .magnetic-btn,
+    .nav__menu-btn,
+    .nav__link--cta,
+    .project-modal__close,
+    .project-modal__nav-btn {
+        cursor: pointer;
+    }
+} 
+
 /* ----------------------------------------
    Typography
    ---------------------------------------- */

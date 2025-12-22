@@ -459,23 +459,21 @@ function initProjectModal() {
             stack: ['PHP', 'MySQL', 'JavaScript', 'jQuery', 'Bootstrap', 'Figma'],
             links: {}
         },
-        youtube: {
+        modnation: {
             number: '03',
-            title: 'YouTube @WNT',
-            subtitle: 'Création de contenu vidéo & VFX',
-            year: '2016 — Présent',
-            role: 'Créateur & Monteur',
+            title: 'ModNation',
+            subtitle: 'Plateforme communautaire automobile',
+            year: '2025',
+            role: 'Full-Stack Developer',
             context: 'Projet Personnel',
             description: `
-                <p>Depuis 2016, je développe ma chaîne YouTube où j'explore la création de contenu sous toutes ses formes : montage vidéo, effets visuels, storytelling et motion design.</p>
-                <p>Ce projet personnel m'a permis de maîtriser la Suite Adobe (Premiere Pro, After Effects, Photoshop) et de développer un œil créatif qui nourrit aujourd'hui mon travail en UX/UI design.</p>
-                <p>Au-delà des compétences techniques, cette expérience m'a appris l'importance du rythme, de la narration et de l'engagement utilisateur — des concepts directement transposables au design d'interfaces.</p>
+                <p>ModNation est une plateforme communautaire dédiée aux passionnés de l'automobile, permettant de partager leurs "builds" (projets de modification de véhicules) et d'inspirer la communauté.</p>
+                <p>Le projet intègre une base de données collaborative de pièces compatibles, facilitant la recherche et le partage d'informations techniques entre passionnés.</p>
+                <p>Stack technique moderne avec Laravel pour le backend robuste, React et TypeScript pour une interface réactive et typée, et MySQL pour la gestion des données relationnelles complexes.</p>
             `,
-            tags: ['MOTION', 'AFTER EFFECTS', 'PREMIERE PRO'],
-            stack: ['After Effects', 'Premiere Pro', 'Photoshop', 'Audition', 'Blender'],
-            links: {
-                site: 'https://www.youtube.com/@WNT_38'
-            }
+            tags: ['LARAVEL', 'REACT', 'TYPESCRIPT'],
+            stack: ['Laravel', 'React', 'TypeScript', 'MySQL', 'Tailwind CSS'],
+            links: {}
         },
         portfolio: {
             number: '04',
@@ -511,22 +509,22 @@ function initProjectModal() {
             stack: ['Next.js', 'TypeScript', 'Python', 'OpenAI API', 'MongoDB', 'Figma'],
             links: {}
         },
-        others: {
+        youtube: {
             number: '06',
-            title: 'Autres Projets',
-            subtitle: 'Explorations créatives et techniques',
-            year: '2022 — Présent',
-            role: 'Developer & Designer',
-            context: 'Projets Académiques & Personnels',
+            title: 'YouTube @WNT',
+            subtitle: 'Création de contenu vidéo & VFX',
+            year: '2016 — Présent',
+            role: 'Créateur & Monteur',
+            context: 'Projet Personnel',
             description: `
-                <p>Au fil de mon parcours, j'ai exploré de nombreuses technologies et approches créatives à travers des projets variés : applications web, expériences interactives, prototypes d'interfaces...</p>
-                <p>Ces projets académiques et personnels m'ont permis de construire une base technique solide tout en développant ma sensibilité design. Chaque projet est une opportunité d'apprendre et d'expérimenter.</p>
-                <p>De la data visualisation au développement mobile, en passant par les expériences WebGL, ma curiosité me pousse à explorer constamment de nouveaux territoires.</p>
+                <p>Depuis 2016, je développe ma chaîne YouTube où j'explore la création de contenu sous toutes ses formes : montage vidéo, effets visuels, storytelling et motion design.</p>
+                <p>Ce projet personnel m'a permis de maîtriser la Suite Adobe (Premiere Pro, After Effects, Photoshop) et de développer un œil créatif qui nourrit aujourd'hui mon travail en UX/UI design.</p>
+                <p>Au-delà des compétences techniques, cette expérience m'a appris l'importance du rythme, de la narration et de l'engagement utilisateur — des concepts directement transposables au design d'interfaces.</p>
             `,
-            tags: ['REACT', 'FIGMA', 'THREE.JS'],
-            stack: ['React', 'Angular', 'Python', 'Java', 'Figma', 'Three.js', 'GSAP'],
+            tags: ['MOTION', 'AFTER EFFECTS', 'PREMIERE PRO'],
+            stack: ['After Effects', 'Premiere Pro', 'Photoshop', 'Audition', 'Blender'],
             links: {
-                github: 'https://github.com/Leo-BERNARD38'
+                site: 'https://www.youtube.com/@WNT_38'
             }
         }
     };
