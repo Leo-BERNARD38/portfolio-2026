@@ -14,9 +14,97 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
     
+    <style>
+        :root {
+            --color-bg: #0a0a0a;
+            --color-white: #ffffff;
+            --color-white-muted: rgba(255, 255, 255, 0.4);
+            --color-accent: #ff4d00;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --space-lg: clamp(1.5rem, 1rem + 2vw, 3rem);
+            --text-4xl: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+            --text-5xl: clamp(3rem, 2rem + 5vw, 7rem);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+        }
+        .loader {
+            position: fixed;
+            inset: 0;
+            background-color: var(--color-bg);
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+        .loader__content { text-align: center; }
+        .loader__logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: var(--space-lg);
+        }
+        .loader__logo-text {
+            font-family: var(--font-display);
+            font-size: var(--text-4xl);
+            font-weight: 500;
+            color: var(--color-white);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: loaderReveal 0.8s var(--ease-out-expo) 0.2s forwards;
+        }
+        .loader__logo-dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--color-accent);
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+            animation: loaderDot 0.6s var(--ease-out-expo) 0.5s forwards;
+        }
+        .loader__progress {
+            width: 200px;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 0.4s ease 0.4s forwards;
+        }
+        .loader__progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+        .loader__text {
+            color: var(--color-white-muted);
+            opacity: 0;
+            animation: fadeIn 0.4s ease 0.6s forwards;
+        }
+        .loader__counter {
+            font-family: var(--font-mono);
+            font-size: var(--text-5xl);
+            color: var(--color-white);
+            opacity: 0;
+            animation: fadeIn 0.4s ease 0.3s forwards;
+        }
+        @keyframes loaderReveal { to { opacity: 1; transform: translateY(0); } }
+        @keyframes loaderDot { to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+        .loader.loaded { animation: loaderExit 1s var(--ease-in-out-circ) forwards; }
+        @keyframes loaderExit {
+            0% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 100% 0); }
+        }
+    </style>
     <link rel="stylesheet" href="assets/styles/main.css">
+    <script src="assets/scripts/main.js" defer></script>
 </head>
-<body>
+<body class="loading">
     <!-- Noise Overlay -->
     <div class="noise-overlay"></div>
 
@@ -587,21 +675,22 @@
                         <span>GitHub</span>
                     </a>
                 </div>
-            </div>
-            
-            <div class="project-modal__nav">
-                <button class="project-modal__nav-btn project-modal__nav-btn--prev" aria-label="Projet précédent">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
-                    </svg>
-                    <span class="mono-text">PRÉCÉDENT</span>
-                </button>
-                <button class="project-modal__nav-btn project-modal__nav-btn--next" aria-label="Projet suivant">
-                    <span class="mono-text">SUIVANT</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                </button>
+                
+                <!-- Navigation intégrée dans le contenu scrollable -->
+                <div class="project-modal__nav">
+                    <button class="project-modal__nav-btn project-modal__nav-btn--prev" aria-label="Projet précédent">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        <span class="mono-text">PRÉCÉDENT</span>
+                    </button>
+                    <button class="project-modal__nav-btn project-modal__nav-btn--next" aria-label="Projet suivant">
+                        <span class="mono-text">SUIVANT</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -639,7 +728,5 @@
             <span class="mono-text">DÉVELOPPÉ AVEC ♥ & PASSION</span>
         </div>
     </footer>
-
-    <script src="assets/scripts/main.js"></script>
 </body>
 </html>

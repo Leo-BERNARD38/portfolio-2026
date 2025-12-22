@@ -190,18 +190,27 @@ function initSmoothScroll() {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
-            const target = document.querySelector(targetId);
             
+            // Close mobile menu if open
+            const menu = document.querySelector('.fullscreen-menu');
+            const menuBtn = document.querySelector('.nav__menu-btn');
+            if (menu && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                menuBtn?.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            }
+            
+            // Si c'est juste "#", retour en haut
+            if (targetId === '#') {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+                return;
+            }
+            
+            const target = document.querySelector(targetId);
             if (target) {
-                // Close mobile menu if open
-                const menu = document.querySelector('.fullscreen-menu');
-                const menuBtn = document.querySelector('.nav__menu-btn');
-                if (menu && menu.classList.contains('active')) {
-                    menu.classList.remove('active');
-                    menuBtn?.classList.remove('active');
-                    document.body.classList.remove('menu-open');
-                }
-                
                 const headerOffset = 0;
                 const elementPosition = target.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
@@ -220,31 +229,48 @@ function initSmoothScroll() {
    ---------------------------------------- */
 function initNavigation() {
     const header = document.querySelector('.header');
+    const navLinks = document.querySelectorAll('.nav__link:not(.nav__link--cta)');
+    const sections = document.querySelectorAll('section[id]');
     let lastScroll = 0;
     let ticking = false;
+    
+    // Active link based on scroll position
+    function updateActiveLink() {
+        const scrollY = window.pageYOffset;
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 150;
+            const sectionHeight = section.offsetHeight;
+            const sectionId = section.getAttribute('id');
+            
+            if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${sectionId}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+        
+        // Remove active if at top (hero)
+        if (scrollY < 300) {
+            navLinks.forEach(link => link.classList.remove('active'));
+        }
+    }
     
     window.addEventListener('scroll', () => {
         if (!ticking) {
             requestAnimationFrame(() => {
-                const currentScroll = window.pageYOffset;
-                
-                // Add/remove background based on scroll
-                if (currentScroll > 100) {
-                    header.style.mixBlendMode = 'normal';
-                    header.style.backgroundColor = 'rgba(10, 10, 10, 0.9)';
-                    header.style.backdropFilter = 'blur(20px)';
-                } else {
-                    header.style.mixBlendMode = 'difference';
-                    header.style.backgroundColor = 'transparent';
-                    header.style.backdropFilter = 'none';
-                }
-                
-                lastScroll = currentScroll;
+                updateActiveLink();
                 ticking = false;
             });
             ticking = true;
         }
     });
+    
+    // Initial check
+    updateActiveLink();
 }
 
 /* ----------------------------------------
@@ -685,19 +711,22 @@ document.querySelectorAll('.bento-item').forEach(item => {
 /* ----------------------------------------
    Console Easter Egg
    ---------------------------------------- */
-console.log(`
-%c LÉO BERNARD %c Portfolio 2026 
-%c⚡ Awwwards Creative Design
-%cDesigned & Developed with passion
+console.log(
+`%c
+LÉO BERNARD
+Web Developer & UX/UI Designer
+%c
 
-%c→ Curious about the code? Let's connect!
-%c→ leobernard712@gmail.com
+    • Stack: HTML5, CSS3 (BEM), Vanilla JS
+    • Performance: Critical CSS, Defer Loading
+    • Animation: Custom RAF & Observers
+    %c
 
-`, 
-'font-size: 24px; font-weight: bold; color: #fff; background: #0a0a0a; padding: 16px 24px; border-radius: 8px 0 0 8px;',
-'font-size: 24px; font-weight: bold; color: #fff; background: #ff4d00; padding: 16px 24px; border-radius: 0 8px 8px 0;',
-'font-size: 14px; color: #ff4d00; padding: 8px 0;',
-'font-size: 13px; color: #666; padding: 4px 0;',
-'font-size: 12px; color: #fff; padding: 8px 0;',
-'font-size: 12px; color: #ff4d00; padding: 4px 0;'
+    👋 Open to work
+    📧 leobernard712@gmail.com
+    
+    `,
+    'font-family: sans-serif; font-size: 24px; font-weight: 800; color: #fff; background: #0a0a0a; line-height: 1.2;',
+    'font-family: monospace; font-size: 12px; color: #888; line-height: 1.6;',
+    'font-family: sans-serif; font-size: 13px; color: #ff4d00; font-weight: bold; line-height: 1.6;'
 );
