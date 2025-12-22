@@ -145,19 +145,19 @@ function initCustomCursor() {
     
     interactiveElements.forEach(el => {
         el.addEventListener('mouseenter', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(2)';
-            cursor.style.backgroundColor = '#CCF077';
-            follower.style.width = '60px';
-            follower.style.height = '60px';
-            follower.style.borderColor = '#CCF077';
+            cursor.style.transform = 'translate(-50%, -50%) scale(1.4)';
+            cursor.style.backgroundColor = '#FF3200';
+            follower.style.width = '56px';
+            follower.style.height = '56px';
+            follower.style.borderColor = '#FF3200';
         });
         
         el.addEventListener('mouseleave', () => {
             cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-            cursor.style.backgroundColor = '#1A1A1A';
-            follower.style.width = '40px';
-            follower.style.height = '40px';
-            follower.style.borderColor = '#1A1A1A';
+            cursor.style.backgroundColor = '#12131A';
+            follower.style.width = '44px';
+            follower.style.height = '44px';
+            follower.style.borderColor = '#12131A';
         });
     });
 }
@@ -232,8 +232,8 @@ function initScrollAnimations() {
     );
     
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        threshold: 0.05,
+        rootMargin: '50px 0px 0px 0px' // Déclenche plus tôt (avant que l'élément soit visible)
     };
     
     const observer = new IntersectionObserver((entries) => {
@@ -245,11 +245,13 @@ function initScrollAnimations() {
         });
     }, observerOptions);
     
-    // Add initial styles
+    // Add initial styles - animation plus rapide, délai réduit
     animatedElements.forEach((el, index) => {
         el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+        el.style.transform = 'translateY(20px)';
+        // Délai max de 0.3s pour les éléments groupés
+        const delay = Math.min(index * 0.05, 0.3);
+        el.style.transition = `opacity 0.4s ease ${delay}s, transform 0.4s ease ${delay}s`;
         observer.observe(el);
     });
     
@@ -286,24 +288,10 @@ function initParallax() {
 }
 
 /* ----------------------------------------
-   Magnetic Buttons
+   Magnetic Buttons (Disabled - "Less is more")
    ---------------------------------------- */
 function initMagneticButtons() {
-    const magneticElements = document.querySelectorAll('.btn--primary, .btn--large, .nav__link--cta');
-    
-    magneticElements.forEach(el => {
-        el.addEventListener('mousemove', (e) => {
-            const rect = el.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            
-            el.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
-        });
-        
-        el.addEventListener('mouseleave', () => {
-            el.style.transform = 'translate(0, 0)';
-        });
-    });
+    // Effet désactivé pour une meilleure UX
 }
 
 /* ----------------------------------------
@@ -617,12 +605,13 @@ function validateEmail(email) {
    Console Easter Egg
    ---------------------------------------- */
 console.log(`
-%c⚡ Portfolio 2026 ⚡
+%c LÉO BERNARD %c Portfolio 2026 
 %cDesigned & Developed with passion
-%c→ Looking for the source code? Let's talk!
+%c→ Curious about the code? Let's connect!
 
 `, 
-'font-size: 24px; font-weight: bold; color: #CCF077; background: #1A1A1A; padding: 10px;',
-'font-size: 14px; color: #1A1A1A; padding: 5px;',
-'font-size: 12px; color: #2C3E50; padding: 5px;'
+'font-size: 20px; font-weight: bold; color: #FAF8F5; background: #12131A; padding: 12px 20px; border-radius: 4px 0 0 4px;',
+'font-size: 20px; font-weight: bold; color: #FAF8F5; background: #FF3200; padding: 12px 20px; border-radius: 0 4px 4px 0;',
+'font-size: 13px; color: #4A4B55; padding: 8px 0;',
+'font-size: 12px; color: #FF3200; padding: 4px 0;'
 );
