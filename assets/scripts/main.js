@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initProjectModal();
     initParallax();
     initTextAnimations();
+    initServiceCardsGlow();
+    initBentoGlow();
 });
 
 /* ----------------------------------------
@@ -630,6 +632,40 @@ function initProjectModal() {
         if (e.key === 'Escape') closeModal();
         if (e.key === 'ArrowLeft') goToPrevProject();
         if (e.key === 'ArrowRight') goToNextProject();
+    });
+}
+
+/* ----------------------------------------
+   Service Cards Glow Effect
+   ---------------------------------------- */
+function initServiceCardsGlow() {
+    const cards = document.querySelectorAll('.service-card');
+    
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            
+            card.style.setProperty('--mouse-x', `${x}%`);
+            card.style.setProperty('--mouse-y', `${y}%`);
+        });
+    });
+}
+
+// Bento Items Glow Effect
+function initBentoGlow() {
+    const bentoItems = document.querySelectorAll('.bento-item');
+    
+    bentoItems.forEach(item => {
+        item.addEventListener('mousemove', (e) => {
+            const rect = item.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            
+            item.style.setProperty('--mouse-x', `${x}%`);
+            item.style.setProperty('--mouse-y', `${y}%`);
+        });
     });
 }
 
