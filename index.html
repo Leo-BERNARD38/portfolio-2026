@@ -6,6 +6,9 @@
     <title>Léo BERNARD — Web Developer & UX-UI Designer</title>
     <meta name="description" content="Portfolio de Léo BERNARD. Développeur web et designer UX/UI basé à Lyon. Création d'expériences digitales centrées sur l'humain.">
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Georgia,serif' font-size='14' font-weight='600' fill='%23ffffff'%3ELB%3C/text%3E%3Ccircle cx='26' cy='8' r='3' fill='%23ff4d00'/%3E%3C/svg%3E">
+    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,6 +17,9 @@
     <link rel="stylesheet" href="assets/styles/main.css">
 </head>
 <body>
+    <!-- Noise Overlay -->
+    <div class="noise-overlay"></div>
+
     <!-- Loader -->
     <div class="loader" id="loader">
         <div class="loader__content">
@@ -24,25 +30,25 @@
             <div class="loader__progress">
                 <div class="loader__progress-bar"></div>
             </div>
-            <span class="loader__text mono-text">Loading experience...</span>
+            <span class="loader__text mono-text">Chargement...</span>
         </div>
     </div>
 
-    <!-- Cursor Custom -->
+    <!-- Custom Cursor -->
     <div class="cursor"></div>
     <div class="cursor-follower"></div>
 
     <!-- Header -->
     <header class="header">
         <nav class="nav">
-            <div class="nav__logo">
+            <a href="#" class="nav__logo">
                 <span class="nav__logo-text">LB</span>
                 <span class="nav__logo-dot"></span>
-            </div>
+            </a>
             <ul class="nav__links">
-                <li><a href="#work" class="nav__link" data-text="Projets">Projets</a></li>
-                <li><a href="#about" class="nav__link" data-text="À propos">À propos</a></li>
-                <li><a href="#services" class="nav__link" data-text="Services">Services</a></li>
+                <li><a href="#work" class="nav__link">Projets</a></li>
+                <li><a href="#about" class="nav__link">À propos</a></li>
+                <li><a href="#services" class="nav__link">Services</a></li>
                 <li><a href="#contact" class="nav__link nav__link--cta">Discutons</a></li>
             </ul>
             <button class="nav__menu-btn" aria-label="Menu">
@@ -52,37 +58,68 @@
         </nav>
     </header>
 
+    <!-- Fullscreen Menu (Mobile) -->
+    <div class="fullscreen-menu">
+        <nav class="fullscreen-menu__nav">
+            <a href="#work" class="fullscreen-menu__link">
+                <span class="fullscreen-menu__link-number">01</span>
+                <span class="fullscreen-menu__link-text">Projets</span>
+            </a>
+            <a href="#about" class="fullscreen-menu__link">
+                <span class="fullscreen-menu__link-number">02</span>
+                <span class="fullscreen-menu__link-text">À propos</span>
+            </a>
+            <a href="#services" class="fullscreen-menu__link">
+                <span class="fullscreen-menu__link-number">03</span>
+                <span class="fullscreen-menu__link-text">Services</span>
+            </a>
+            <a href="#contact" class="fullscreen-menu__link">
+                <span class="fullscreen-menu__link-number">04</span>
+                <span class="fullscreen-menu__link-text">Contact</span>
+            </a>
+        </nav>
+        <div class="fullscreen-menu__footer">
+            <div class="fullscreen-menu__socials">
+                <a href="https://www.linkedin.com/in/léo-bernard-wnt/" target="_blank" class="fullscreen-menu__social mono-text">LinkedIn</a>
+                <a href="https://github.com/Leo-BERNARD38" target="_blank" class="fullscreen-menu__social mono-text">GitHub</a>
+                <a href="https://www.youtube.com/@WNT_38" target="_blank" class="fullscreen-menu__social mono-text">YouTube</a>
+            </div>
+            <span class="mono-text" style="color: rgba(255,255,255,0.4);">Lyon, France</span>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero__grid">
-            <div class="hero__content">
+        <div class="hero__bg-text">CREATIVE</div>
+        
+        <div class="hero__content">
+            <div class="hero__main">
                 <p class="hero__label mono-text">
-                    <span class="hero__label-number">01</span>
+                    <span class="hero__label-line"></span>
                     Web Developer & UX-UI Designer
                 </p>
                 <h1 class="hero__title">
-                    La tech au service<br>
-                    de <em>l'humain</em>
+                    <span class="hero__title-line">La tech au</span>
+                    <span class="hero__title-line">service de</span>
+                    <span class="hero__title-line"><em>l'humain</em></span>
                 </h1>
-                <p class="hero__subtitle">
+            </div>
+            
+            <div class="hero__aside">
+                <p class="hero__description">
                     Je transforme des idées complexes en expériences digitales 
                     intuitives. Code créatif, design réfléchi, résultats concrets.
                 </p>
                 <div class="hero__cta">
-                    <a href="#work" class="btn btn--primary">
+                    <a href="#work" class="btn btn--primary magnetic-btn">
                         <span>Voir les projets</span>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M7 17L17 7M17 7H7M17 7V17"/>
                         </svg>
                     </a>
-                    <a href="assets/files/CV_BERNARD_Leo_2025.pdf" target="_blank" class="btn btn--secondary">Télécharger CV</a>
-                </div>
-            </div>
-            <div class="hero__visual">
-                <div class="hero__image-wrapper">
-                    <div class="hero__image-placeholder">
-                        <span class="mono-text">PORTRAIT.IMG</span>
-                    </div>
+                    <a href="assets/files/CV_BERNARD_Leo_2025.pdf" target="_blank" class="btn btn--secondary">
+                        Télécharger CV
+                    </a>
                 </div>
                 <div class="hero__stats">
                     <div class="stat">
@@ -96,6 +133,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="hero__scroll">
             <span class="mono-text">Scroll</span>
             <div class="hero__scroll-line"></div>
@@ -128,11 +166,11 @@
         </div>
     </div>
 
-    <!-- Work Section - Bento Grid -->
+    <!-- Work Section -->
     <section id="work" class="work">
         <div class="section-header">
             <div class="section-header__label">
-                <span class="mono-text">02</span>
+                <span class="mono-text">01</span>
                 <span class="mono-text">SELECTED WORK</span>
             </div>
             <h2 class="section-header__title">Projets <em>sélectionnés</em></h2>
@@ -147,6 +185,11 @@
                             <span class="mono-text">OPTIWITS.JPG</span>
                         </div>
                         <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </div>
                     </div>
                     <div class="bento-item__content">
                         <div class="bento-item__tags">
@@ -169,6 +212,11 @@
                             <span class="mono-text">CCP.JPG</span>
                         </div>
                         <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </div>
                     </div>
                     <div class="bento-item__content">
                         <div class="bento-item__tags">
@@ -191,6 +239,11 @@
                             <span class="mono-text">YOUTUBE.JPG</span>
                         </div>
                         <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </div>
                     </div>
                     <div class="bento-item__content">
                         <div class="bento-item__tags">
@@ -212,6 +265,11 @@
                             <span class="mono-text">FOLIO.JPG</span>
                         </div>
                         <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </div>
                     </div>
                     <div class="bento-item__content">
                         <h3 class="bento-item__title">Portfolio 2024</h3>
@@ -228,6 +286,11 @@
                             <span class="mono-text">SECRET.JPG</span>
                         </div>
                         <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </div>
                     </div>
                     <div class="bento-item__content">
                         <h3 class="bento-item__title">Projet Secret 🤫</h3>
@@ -244,6 +307,11 @@
                             <span class="mono-text">MISC.JPG</span>
                         </div>
                         <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </div>
                     </div>
                     <div class="bento-item__content">
                         <div class="bento-item__tags">
@@ -277,12 +345,11 @@
             <div class="about__content-col">
                 <div class="section-header section-header--left">
                     <div class="section-header__label">
-                        <span class="mono-text">03</span>
+                        <span class="mono-text">02</span>
                         <span class="mono-text">À PROPOS</span>
                     </div>
                     <h2 class="section-header__title">
-                        Développeur avec une<br>
-                        <em>âme de designer</em>
+                        Développeur avec une <em>âme de designer</em>
                     </h2>
                 </div>
                 <div class="about__text">
@@ -297,7 +364,7 @@
                         et sensibilité design pour créer des produits qui comptent vraiment.
                     </p>
                 </div>
-                <div class="about__skills">
+                <div class="about__skills" data-stagger>
                     <div class="skill-group">
                         <h4 class="skill-group__title mono-text">DESIGN</h4>
                         <ul class="skill-group__list">
@@ -332,9 +399,9 @@
 
     <!-- Services Section -->
     <section id="services" class="services">
-        <div class="section-header">
+        <div class="section-header section-header--center">
             <div class="section-header__label">
-                <span class="mono-text">04</span>
+                <span class="mono-text">03</span>
                 <span class="mono-text">SERVICES</span>
             </div>
             <h2 class="section-header__title">Ce que je <em>propose</em></h2>
@@ -407,9 +474,9 @@
 
     <!-- Testimonials -->
     <section class="testimonials">
-        <div class="section-header">
+        <div class="section-header section-header--center">
             <div class="section-header__label">
-                <span class="mono-text">05</span>
+                <span class="mono-text">04</span>
                 <span class="mono-text">TESTIMONIALS</span>
             </div>
             <h2 class="section-header__title">Ce qu'ils <em>disent</em></h2>
@@ -418,8 +485,8 @@
         <div class="testimonials__slider">
             <div class="testimonial">
                 <blockquote class="testimonial__quote">
-                    "Léo a su transformer notre vision en une plateforme SaaS 
-                    performante et intuitive. Autonome, créatif et rigoureux."
+                    Léo a su transformer notre vision en une plateforme SaaS 
+                    performante et intuitive. Autonome, créatif et rigoureux.
                 </blockquote>
                 <div class="testimonial__author">
                     <div class="testimonial__avatar"></div>
@@ -437,21 +504,21 @@
         <div class="contact__wrapper">
             <div class="section-header section-header--center">
                 <div class="section-header__label">
-                    <span class="mono-text">06</span>
+                    <span class="mono-text">05</span>
                     <span class="mono-text">CONTACT</span>
                 </div>
-                <h2 class="contact__title">
-                    Une idée, un projet ?<br>
-                    <em>Discutons</em>
-                </h2>
-                <p class="contact__subtitle">
-                    Disponible pour stages, alternances et opportunités.
-                    <br>Réponse sous 24h garantie.
-                </p>
             </div>
+            <h2 class="contact__title">
+                Une idée, un projet ?<br>
+                <em>Discutons</em>
+            </h2>
+            <p class="contact__subtitle">
+                Disponible pour stages, alternances et opportunités.
+                <br>Réponse sous 24h garantie.
+            </p>
 
             <div class="contact__cta">
-                <a href="mailto:leobernard712@gmail.com" class="btn btn--large">
+                <a href="mailto:leobernard712@gmail.com" class="btn btn--large magnetic-btn">
                     <span>leobernard712@gmail.com</span>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M7 17L17 7M17 7H7M17 7V17"/>
@@ -460,16 +527,16 @@
             </div>
 
             <div class="contact__socials">
-                <a href="https://www.linkedin.com/in/léo-bernard-wnt/" target="_blank" class="social-link" aria-label="LinkedIn">
+                <a href="https://www.linkedin.com/in/léo-bernard-wnt/" target="_blank" class="social-link">
                     <span class="mono-text">LINKEDIN</span>
                 </a>
-                <a href="https://github.com/Leo-BERNARD38" target="_blank" class="social-link" aria-label="GitHub">
+                <a href="https://github.com/Leo-BERNARD38" target="_blank" class="social-link">
                     <span class="mono-text">GITHUB</span>
                 </a>
-                <a href="https://www.youtube.com/@WNT_38" target="_blank" class="social-link" aria-label="YouTube">
+                <a href="https://www.youtube.com/@WNT_38" target="_blank" class="social-link">
                     <span class="mono-text">YOUTUBE</span>
                 </a>
-                <a href="tel:+33674359867" class="social-link" aria-label="Téléphone">
+                <a href="tel:+33674359867" class="social-link">
                     <span class="mono-text">06 74 35 98 67</span>
                 </a>
             </div>
