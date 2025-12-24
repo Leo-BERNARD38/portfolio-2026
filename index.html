@@ -21,6 +21,7 @@
             --color-white-muted: rgba(255, 255, 255, 0.4);
             --color-accent: #ff4d00;
             --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Outfit', -apple-system, sans-serif;
             --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
             --space-lg: clamp(1.5rem, 1rem + 2vw, 3rem);
             --text-xs: clamp(0.625rem, 0.5rem + 0.25vw, 0.75rem);
@@ -30,9 +31,33 @@
             --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
         }
 
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-weight: 300;
+            line-height: 1.6;
+            color: var(--color-white);
+            background-color: var(--color-bg);
+            overflow-x: hidden;
+        }
+
         body.loading {
             overflow: hidden;
             height: 100vh;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 99990;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         .mono-text {
@@ -74,6 +99,7 @@
         .loader__content { text-align: center; z-index: 1; }
         .loader__letters {
             display: flex;
+            justify-content: center;
             gap: 0.1em;
             margin-bottom: var(--space-lg);
         }
