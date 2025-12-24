@@ -7,7 +7,7 @@
     <meta name="description" content="Portfolio de Léo BERNARD. Développeur web et designer UX/UI basé à Lyon. Création d'expériences digitales centrées sur l'humain.">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Georgia,serif' font-size='14' font-weight='600' fill='%23ffffff'%3ELB%3C/text%3E%3Ccircle cx='26' cy='8' r='3' fill='%23ff4d00'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Cdefs%3E%3CclipPath id='cf'%3E%3Cpolygon points='0,0 32,0 32,32'/%3E%3C/clipPath%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Cg clip-path='url(%23cf)'%3E%3Crect width='32' height='32' rx='6' fill='%23ff3200'/%3E%3C/g%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='14' font-weight='600' fill='%23ffffff'%3ELB%3C/text%3E%3C/svg%3E">
     
     <!-- Fonts Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,67 +53,71 @@
             justify-content: center;
             flex-direction: column;
             gap: var(--space-lg);
+            overflow: hidden;
         }
-        .loader__content { text-align: center; }
-        .loader__logo {
+        .loader__bg {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+        }
+        .loader__panel--orange {
+            position: absolute;
+            inset: 0;
+            background-color: var(--color-accent);
+            clip-path: polygon(100% 0, 100% 0, 100% 0);
+            animation: panelReveal 1.4s var(--ease-out-expo) 0.2s forwards;
+        }
+        @keyframes panelReveal {
+            0% { clip-path: polygon(100% 0, 100% 0, 100% 0); }
+            100% { clip-path: polygon(0 0, 100% 0, 100% 100%); }
+        }
+        .loader__content { text-align: center; z-index: 1; }
+        .loader__letters {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            gap: 0.1em;
             margin-bottom: var(--space-lg);
         }
-        .loader__logo-text {
-            font-family: var(--font-display);
-            font-size: var(--text-4xl);
-            font-weight: 500;
+        .loader__letter {
+            font-family: Georgia, serif;
+            font-size: clamp(5rem, 18vw, 15rem);
+            font-weight: 600;
             color: var(--color-white);
+            display: inline-block;
             opacity: 0;
-            transform: translateY(30px);
-            animation: loaderReveal 0.8s var(--ease-out-expo) 0.2s forwards;
+            transform: translateY(60px);
         }
-        .loader__logo-dot {
-            width: 12px;
-            height: 12px;
-            background-color: var(--color-accent);
-            border-radius: 50%;
-            opacity: 0;
-            transform: scale(0);
-            animation: loaderDot 0.6s var(--ease-out-expo) 0.5s forwards;
-        }
+        .loader__letter--l { animation: letterReveal 1s var(--ease-out-expo) 0.6s forwards; }
+        .loader__letter--b { animation: letterReveal 1s var(--ease-out-expo) 0.7s forwards; }
+        
         .loader__progress {
-            width: 200px;
+            width: 240px;
             height: 2px;
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
             overflow: hidden;
             opacity: 0;
-            animation: fadeIn 0.4s ease 0.4s forwards;
+            margin: 0 auto;
+            animation: fadeIn 0.4s ease 0.8s forwards;
         }
         .loader__progress-bar {
             width: 0%;
             height: 100%;
-            background-color: var(--color-accent);
+            background-color: var(--color-white);
             transition: width 0.3s ease;
         }
         .loader__text {
+            display: block;
+            margin-top: 12px;
             color: var(--color-white-muted);
             opacity: 0;
-            animation: fadeIn 0.4s ease 0.6s forwards;
+            animation: fadeIn 0.4s ease 1s forwards;
         }
-        .loader__counter {
-            font-family: var(--font-mono);
-            font-size: var(--text-5xl);
-            color: var(--color-white);
-            opacity: 0;
-            animation: fadeIn 0.4s ease 0.3s forwards;
-        }
-        @keyframes loaderReveal { to { opacity: 1; transform: translateY(0); } }
-        @keyframes loaderDot { to { opacity: 1; transform: scale(1); } }
+        @keyframes letterReveal { to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { to { opacity: 1; } }
         .loader.loaded { animation: loaderExit 1s var(--ease-in-out-circ) forwards; }
         @keyframes loaderExit {
-            0% { clip-path: inset(0 0 0 0); }
-            100% { clip-path: inset(0 0 100% 0); }
+            0% { clip-path: polygon(-100% 0%, 100% -200%, 300% 0%, 100% 200%); }
+            100% { clip-path: polygon(100% 0%, 300% -200%, 500% 0%, 300% 200%); }
         }
     </style>
     <!-- Non-critical CSS (Loaded asynchronously) -->
@@ -132,10 +136,13 @@
 
     <!-- Loader -->
     <div class="loader" id="loader">
+        <div class="loader__bg">
+            <div class="loader__panel loader__panel--orange"></div>
+        </div>
         <div class="loader__content">
-            <div class="loader__logo">
-                <span class="loader__logo-text">LB</span>
-                <span class="loader__logo-dot"></span>
+            <div class="loader__letters">
+                <span class="loader__letter loader__letter--l">L</span>
+                <span class="loader__letter loader__letter--b">B</span>
             </div>
             <div class="loader__progress">
                 <div class="loader__progress-bar"></div>
@@ -163,6 +170,11 @@
         })();
     </script>
 
+    <!-- Page Transition Overlay -->
+    <div class="page-transition">
+        <div class="page-transition__panel"></div>
+    </div>
+
     <!-- Custom Cursor -->
     <div class="cursor"></div>
     <div class="cursor-follower"></div>
@@ -171,8 +183,7 @@
     <header class="header">
         <nav class="nav">
             <a href="#" class="nav__logo">
-                <span class="nav__logo-text">LB</span>
-                <span class="nav__logo-dot"></span>
+                <img src="assets/images/logo.svg" alt="LB Logo" class="nav__logo-img">
             </a>
             <ul class="nav__links">
                 <li><a href="#work" class="nav__link">Projets</a></li>
@@ -726,7 +737,7 @@
     <footer class="footer">
         <div class="footer__grid">
             <div class="footer__col">
-                <span class="footer__logo">LB</span>
+                <img src="assets/images/logo.svg" alt="LB Logo" class="footer__logo-img">
                 <p class="footer__tagline">Léo BERNARD</p>
             </div>
             <div class="footer__col">

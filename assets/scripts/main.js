@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initFullscreenMenu();
     initRevealAnimations();
     initMagneticElements();
+    PageTransition.init();
     initProjectModal();
     initParallax();
     initTextAnimations();
@@ -442,6 +443,57 @@ function initTextAnimations() {
 }
 
 /* ----------------------------------------
+   Page Transition Manager
+   ---------------------------------------- */
+const PageTransition = {
+    element: null,
+    panel: null,
+    isAnimating: false,
+    
+    init() {
+        this.element = document.querySelector('.page-transition');
+        this.panel = document.querySelector('.page-transition__panel');
+    },
+    
+    animate(callback, reverse = false) {
+        if (this.isAnimating || !this.element) {
+            if (callback) callback();
+            return;
+        }
+        
+        this.isAnimating = true;
+        
+        if (reverse) {
+            this.element.classList.add('is-reverse');
+        } else {
+            this.element.classList.remove('is-reverse');
+        }
+        
+        // Start In Animation
+        this.element.classList.remove('is-animating-out');
+        this.element.classList.add('is-animating-in');
+        
+        // Wait for In Animation (0.8s)
+        setTimeout(() => {
+            // Execute callback (change content)
+            if (callback) callback();
+
+            // Start Out Animation
+            this.element.classList.remove('is-animating-in');
+            this.element.classList.add('is-animating-out');
+            
+            // Reset after Out Animation (0.8s)
+            setTimeout(() => {
+                this.element.classList.remove('is-animating-out');
+                this.element.classList.remove('is-reverse');
+                this.isAnimating = false;
+            }, 800);
+            
+        }, 800);
+    }
+};
+
+/* ----------------------------------------
    Project Modal System
    ---------------------------------------- */
 function initProjectModal() {
@@ -565,18 +617,22 @@ function initProjectModal() {
         const project = projectsData[projectId];
         if (!project) return;
         
-        currentProjectIndex = projectKeys.indexOf(projectId);
-        updateModalContent(project);
-        
-        modal.classList.add('active');
-        document.body.classList.add('modal-open');
-        
-        updateNavButtons();
+        PageTransition.animate(() => {
+            currentProjectIndex = projectKeys.indexOf(projectId);
+            updateModalContent(project);
+            
+            modal.classList.add('active');
+            document.body.classList.add('modal-open');
+            
+            updateNavButtons();
+        });
     }
     
     function closeModal() {
-        modal.classList.remove('active');
-        document.body.classList.remove('modal-open');
+        PageTransition.animate(() => {
+            modal.classList.remove('active');
+            document.body.classList.remove('modal-open');
+        }, true);
     }
     
     function updateModalContent(project) {

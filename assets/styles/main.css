@@ -1,7 +1,7 @@
-/* ========================================
+﻿/* ========================================
    PORTFOLIO 2026 - Awwwards Creative Design
    Direction Artistique: Bold, Creative, Immersive
-   Version 3.0 — Full Redesign
+   Version 3.0 - Full Redesign
    ======================================== */
 
 /* ----------------------------------------
@@ -266,11 +266,6 @@ em {
 }
 
 /* ----------------------------------------
-   Loader
-   ---------------------------------------- */
-/* Loader styles moved to index.html for Critical Rendering Path */
-
-/* ----------------------------------------
    Header & Navigation
    ---------------------------------------- */
 .header {
@@ -296,40 +291,21 @@ em {
 .nav__logo {
     display: flex;
     align-items: center;
-    gap: 6px;
     z-index: 1001;
-    padding: 10px 14px;
-    background-color: rgba(10, 10, 10, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
-    backdrop-filter: blur(12px);
     transition: all 0.4s var(--ease-out-expo);
 }
 
 .nav__logo:hover {
-    background-color: rgba(10, 10, 10, 0.8);
     border-color: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
 }
 
-.nav__logo-text {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--color-white);
-    letter-spacing: -0.02em;
-}
-
-.nav__logo-dot {
-    width: 6px;
-    height: 6px;
-    background-color: var(--color-accent);
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(0.85); }
+.nav__logo-img {
+    width: 48px;
+    height: 48px;
+    display: block;
 }
 
 /* Desktop Nav Links - Pill Container */
@@ -497,8 +473,8 @@ em {
     font-size: var(--text-4xl);
     color: var(--color-white);
     opacity: 0;
-    transform: translateY(60px);
-    transition: opacity 0.6s ease, transform 0.6s var(--ease-out-expo);
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s var(--ease-out-expo);
 }
 
 .fullscreen-menu.active .fullscreen-menu__link {
@@ -711,7 +687,7 @@ em {
 
 @keyframes scrollIndicator {
     0%, 100% { transform: translateY(0); opacity: 1; }
-    80% { transform: translateY(50px); opacity: 0; }
+    80% { transform: translateY(30px); opacity: 0; }
 }
 
 /* Hero Stats */
@@ -974,7 +950,7 @@ em {
 }
 
 .bento-item:hover {
-    transform: translateY(-12px) scale(1.01);
+    transform: translateY(-6px) scale(1.01);
     border-color: transparent;
     box-shadow: 
         0 30px 60px -15px rgba(0, 0, 0, 0.5),
@@ -1714,10 +1690,9 @@ em {
     }
 }
 
-.footer__logo {
-    font-family: var(--font-display);
-    font-size: var(--text-3xl);
-    font-weight: 600;
+.footer__logo-img {
+    width: 48px;
+    height: 48px;
     display: block;
     margin-bottom: var(--space-sm);
 }
@@ -1786,7 +1761,6 @@ em {
     z-index: 10000;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
 .project-modal.active {
@@ -1806,12 +1780,6 @@ em {
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    transform: translateY(100%);
-    transition: transform 0.7s var(--ease-out-expo);
-}
-
-.project-modal.active .project-modal__container {
-    transform: translateY(0);
 }
 
 /* Close Button */
@@ -2168,9 +2136,9 @@ em {
 /* Reveal Animation */
 [data-reveal] {
     opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.8s var(--ease-out-expo),
-                transform 0.8s var(--ease-out-expo);
+    transform: translateY(20px);
+    transition: opacity 1s var(--ease-out-expo),
+                transform 1s var(--ease-out-expo);
 }
 
 [data-reveal].revealed {
@@ -2186,9 +2154,9 @@ em {
 /* Stagger Animation */
 [data-stagger] > * {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s var(--ease-out-expo),
-                transform 0.6s var(--ease-out-expo);
+    transform: translateY(15px);
+    transition: opacity 0.8s var(--ease-out-expo),
+                transform 0.8s var(--ease-out-expo);
 }
 
 [data-stagger].revealed > *:nth-child(1) { transition-delay: 0.05s; }
@@ -2221,4 +2189,59 @@ em {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     opacity: 0.05;
     pointer-events: none;
+}
+/* ----------------------------------------
+   Page Transition
+   ---------------------------------------- */
+.page-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-transition__panel {
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-accent);
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    will-change: clip-path;
+}
+
+.page-transition.is-animating-in .page-transition__panel {
+    animation: transitionIn 0.8s var(--ease-out-expo) forwards;
+}
+
+.page-transition.is-animating-out .page-transition__panel {
+    animation: transitionOut 0.8s var(--ease-out-expo) forwards;
+}
+
+.page-transition.is-reverse.is-animating-in .page-transition__panel {
+    animation: transitionInReverse 0.8s var(--ease-out-expo) forwards;
+}
+
+.page-transition.is-reverse.is-animating-out .page-transition__panel {
+    animation: transitionOutReverse 0.8s var(--ease-out-expo) forwards;
+}
+
+@keyframes transitionIn {
+    0% { clip-path: polygon(100% 0, 100% 0, 150% 100%, 150% 100%); }
+    100% { clip-path: polygon(-50% 0, 100% 0, 150% 100%, 0% 100%); }
+}
+
+@keyframes transitionOut {
+    0% { clip-path: polygon(-50% 0, 100% 0, 150% 100%, 0% 100%); }
+    100% { clip-path: polygon(-50% 0, -50% 0, 0% 100%, 0% 100%); }
+}
+
+@keyframes transitionInReverse {
+    0% { clip-path: polygon(-50% 0, -50% 0, 0% 100%, 0% 100%); }
+    100% { clip-path: polygon(-50% 0, 100% 0, 150% 100%, 0% 100%); }
+}
+
+@keyframes transitionOutReverse {
+    0% { clip-path: polygon(-50% 0, 100% 0, 150% 100%, 0% 100%); }
+    100% { clip-path: polygon(100% 0, 100% 0, 150% 100%, 150% 100%); }
 }
