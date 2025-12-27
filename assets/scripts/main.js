@@ -122,8 +122,8 @@ function initCustomCursor() {
     
     if (!cursor || !follower) return;
     
-    // Check for touch device
-    if ('ontouchstart' in window || window.matchMedia('(max-width: 1024px)').matches) {
+    // Check for touch device or no hover capability
+    if (window.matchMedia('(hover: none)').matches) {
         cursor.style.display = 'none';
         follower.style.display = 'none';
         return;
