@@ -2049,28 +2049,147 @@ em {
     max-width: 700px;
 }
 
-/* Image - Ratio ajusté pour économiser l'espace vertical */
+/* Image - Gallery Grid System */
 .project-modal__image {
-    position: relative;
+    display: none; /* Hidden by default if empty */
     width: 100%;
-    aspect-ratio: 2/1;
-    border-radius: 16px;
-    overflow: hidden;
     margin-bottom: var(--space-xl);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    gap: var(--space-md);
 }
 
-.project-modal__image-placeholder {
+/* Show when it has content */
+.project-modal__image:not(:empty) {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+/* Desktop Gallery Layouts */
+@media (min-width: 768px) {
+    /* 2 Images: Side by side */
+    .project-modal__image.has-2-images {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    /* 3 Images: Bento style (1 large top, 2 small bottom) */
+    .project-modal__image.has-3-images {
+        grid-template-columns: 1fr 1fr;
+    }
+    .project-modal__image.has-3-images .project-modal__image-wrapper:first-child {
+        grid-column: 1 / -1;
+    }
+
+    /* 4 Images: 2x2 Grid */
+    .project-modal__image.has-4-images {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    /* 5+ Images: Masonry-like auto grid */
+    .project-modal__image.has-5-images,
+    .project-modal__image.has-6-images {
+        grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
+    }
+}
+
+.project-modal__image-wrapper {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: var(--color-bg-secondary);
+}
+
+.project-modal__image-wrapper img {
     width: 100%;
     height: 100%;
-    background: linear-gradient(145deg, 
-        var(--color-bg-secondary) 0%, 
-        var(--color-bg-tertiary) 50%, 
-        rgba(255, 77, 0, 0.08) 100%);
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s var(--ease-out-expo);
+}
+
+/* Overlay Effect - Consistent with Bento Items */
+.project-modal__image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, var(--color-bg) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.project-modal__image-wrapper {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: var(--color-bg-secondary);
+    cursor: none; /* Custom cursor handled by JS */
+}
+
+.project-modal__image-wrapper:hover .project-modal__image-overlay {
+    opacity: 1;
+}
+
+.project-modal__image-wrapper:hover img {
+    transform: scale(1.03);
+}
+
+/* Lightbox */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 11000; /* Higher than project modal (10000) */
+    background-color: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-white-muted);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s var(--ease-out-expo);
+}
+
+.lightbox.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.lightbox__content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    transform: scale(0.95);
+    transition: transform 0.6s var(--ease-out-expo);
+}
+
+.lightbox.active .lightbox__content {
+    transform: scale(1);
+}
+
+.lightbox__img {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.5);
+}
+
+.lightbox__close {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: none;
+    border: none;
+    color: var(--color-white);
+    cursor: pointer;
+    z-index: 2001;
+    padding: 10px;
+    transition: transform 0.3s ease;
+}
+
+.lightbox__close:hover {
+    transform: rotate(90deg);
+    color: var(--color-accent);
 }
 
 /* Details Grid - Plus compact */

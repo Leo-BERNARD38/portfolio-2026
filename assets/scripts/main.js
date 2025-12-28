@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initTextAnimations();
     initServiceCardsGlow();
     initBentoGlow();
+    initLightbox();
 });
 
 /* ----------------------------------------
@@ -531,7 +532,13 @@ function initProjectModal() {
             `,
             tags: ['SAAS', 'UX/UI', 'FULL-STACK'],
             stack: ['React', 'JavaScript', 'Python', 'MongoDB', 'FastAPI', 'Figma', 'Docker', 'GitLab'],
-            links: []
+            images: [
+                'assets/images/project_optiwits_1.webp',
+                'assets/images/project_optiwits_2.webp',
+            ],
+            links: [
+                { url : 'https://www.greenwits.com/solutions/optiwits-software/', label: 'OptiWITS™', icon: 'link' }
+            ]
         },
         ccp: {
             number: '02',
@@ -549,9 +556,8 @@ function initProjectModal() {
             `,
             tags: ['B2B', 'CRM', 'PHP'],
             stack: ['PHP', 'MySQL', 'JavaScript', 'jQuery', 'Bootstrap', 'GitHub'],
-            links: [
-                { url: '#', label: 'Rapport de stage (PDF)', icon: 'file' }
-            ]
+            images: [],
+            links: []
         },
         modnation: {
             number: '03',
@@ -567,6 +573,7 @@ function initProjectModal() {
             `,
             tags: ['LARAVEL', 'REACT', 'TYPESCRIPT'],
             stack: ['Laravel', 'React', 'TypeScript', 'MySQL', 'Mantine', 'Figma'],
+            images: [],
             links: []
         },
         portfolio: {
@@ -583,6 +590,7 @@ function initProjectModal() {
             `,
             tags: ['WEBGL', 'THREE.JS', 'DESIGN'],
             stack: ['HTML/CSS', 'JavaScript', 'Three.js', 'WebGL', 'Figma'],
+            images: [],
             links: [
                 { url: 'https://leo-bernard38.github.io/Portfolio-2025/', label: 'Portfolio 2025', icon: 'link' },
                 { url: 'https://github.com/Leo-BERNARD38/Portfolio-2025', label: 'Code Source', icon: 'link' }
@@ -602,6 +610,7 @@ function initProjectModal() {
             `,
             tags: ['STARTUP', 'IA', 'REACT', 'Python'],
             stack: ['React', 'TypeScript', 'Python', 'Mistral API', 'MySQL', 'Figma'],
+            images: [],
             links: []
         },
         youtube: {
@@ -618,6 +627,7 @@ function initProjectModal() {
             `,
             tags: ['PREMIERE PRO', 'AFTER EFFECTS', 'MOTION DESIGN'],
             stack: ['After Effects', 'Premiere Pro', 'Photoshop', 'Audition', 'Filmora', 'Topaz Labs'],
+            images: [],
             links: [
                 { url: 'https://www.youtube.com/@WNT_38', label: 'YouTube @WNT', icon: 'link' }
             ]
@@ -658,6 +668,62 @@ function initProjectModal() {
         modal.querySelector('.project-modal__context').textContent = project.context;
         modal.querySelector('.project-modal__description').innerHTML = project.description;
         
+        // Handle Images
+        const imageContainer = modal.querySelector('.project-modal__image');
+        if (imageContainer) {
+            imageContainer.innerHTML = ''; // Clear existing content
+            imageContainer.className = 'project-modal__image'; // Reset classes
+            
+            if (project.images && Array.isArray(project.images) && project.images.length > 0) {
+                // Add classes for grid layout
+                imageContainer.classList.add(`has-${project.images.length}-images`);
+                if (project.images.length > 1) imageContainer.classList.add('is-gallery');
+                
+                project.images.forEach(imgSrc => {
+                    const imgWrapper = document.createElement('div');
+                    imgWrapper.className = 'project-modal__image-wrapper';
+                    imgWrapper.setAttribute('data-cursor', 'hover');
+                    
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.alt = project.title;
+                    img.loading = 'lazy';
+                    
+                    // Overlay for hover effect
+                    const overlay = document.createElement('div');
+                    overlay.className = 'project-modal__image-overlay';
+                    
+                    imgWrapper.appendChild(img);
+                    imgWrapper.appendChild(overlay);
+                    imageContainer.appendChild(imgWrapper);
+
+                    // Lightbox Event
+                    imgWrapper.addEventListener('click', () => {
+                        openLightbox(imgSrc, project.title);
+                    });
+
+                    // Custom Cursor Events
+                    imgWrapper.addEventListener('mouseenter', () => {
+                        const cursor = document.querySelector('.cursor');
+                        const follower = document.querySelector('.cursor-follower');
+                        if (cursor && follower) {
+                            cursor.classList.add('active');
+                            follower.classList.add('active');
+                        }
+                    });
+                    
+                    imgWrapper.addEventListener('mouseleave', () => {
+                        const cursor = document.querySelector('.cursor');
+                        const follower = document.querySelector('.cursor-follower');
+                        if (cursor && follower) {
+                            cursor.classList.remove('active');
+                            follower.classList.remove('active');
+                        }
+                    });
+                });
+            }
+        }
+
         const tagsContainer = modal.querySelector('.project-modal__tags');
         tagsContainer.innerHTML = project.tags.map(tag => 
             `<span class="tag mono-text">${tag}</span>`
@@ -778,6 +844,87 @@ function initProjectModal() {
         if (e.key === 'ArrowLeft') goToPrevProject();
         if (e.key === 'ArrowRight') goToNextProject();
     });
+}
+
+/* ----------------------------------------
+   Lightbox System
+   ---------------------------------------- */
+function initLightbox() {
+    // Create Lightbox DOM
+    const lightbox = document.createElement('div');
+    lightbox.className = 'lightbox';
+    lightbox.id = 'lightbox';
+    lightbox.innerHTML = `
+        <button class="lightbox__close" aria-label="Fermer">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+        <div class="lightbox__content">
+            <img src="" alt="" class="lightbox__img">
+        </div>
+    `;
+    document.body.appendChild(lightbox);
+
+    const closeBtn = lightbox.querySelector('.lightbox__close');
+    const img = lightbox.querySelector('.lightbox__img');
+
+    // Close functions
+    const closeLightbox = () => {
+        lightbox.classList.remove('active');
+        setTimeout(() => {
+            img.src = '';
+        }, 400);
+
+        // Reset cursor state when closing
+        const cursor = document.querySelector('.cursor');
+        const follower = document.querySelector('.cursor-follower');
+        if (cursor && follower) {
+            cursor.classList.remove('active');
+            follower.classList.remove('active');
+        }
+    };
+
+    closeBtn.addEventListener('click', closeLightbox);
+
+    // Custom Cursor for Close Button
+    closeBtn.addEventListener('mouseenter', () => {
+        const cursor = document.querySelector('.cursor');
+        const follower = document.querySelector('.cursor-follower');
+        if (cursor && follower) {
+            cursor.classList.add('active');
+            follower.classList.add('active');
+        }
+    });
+    
+    closeBtn.addEventListener('mouseleave', () => {
+        const cursor = document.querySelector('.cursor');
+        const follower = document.querySelector('.cursor-follower');
+        if (cursor && follower) {
+            cursor.classList.remove('active');
+            follower.classList.remove('active');
+        }
+    });
+
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+            closeLightbox();
+        }
+    });
+}
+
+function openLightbox(src, alt) {
+    const lightbox = document.getElementById('lightbox');
+    const img = lightbox.querySelector('.lightbox__img');
+    
+    if (!lightbox || !img) return;
+
+    img.src = src;
+    img.alt = alt || '';
+    lightbox.classList.add('active');
 }
 
 /* ----------------------------------------
