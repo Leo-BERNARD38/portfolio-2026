@@ -437,8 +437,15 @@ function initTextAnimations() {
     const heroTitleLines = document.querySelectorAll('.hero__title-line');
     
     heroTitleLines.forEach(line => {
-        const text = line.textContent;
-        line.innerHTML = `<span>${text}</span>`;
+        // Preserve inline markup (<em>, <u>, etc.) by wrapping existing nodes.
+        // Also keep it idempotent if called multiple times.
+        if (line.childNodes.length === 1 && line.firstElementChild?.tagName === 'SPAN') return;
+
+        const wrapper = document.createElement('span');
+        while (line.firstChild) {
+            wrapper.appendChild(line.firstChild);
+        }
+        line.appendChild(wrapper);
     });
 }
 
@@ -512,33 +519,39 @@ function initProjectModal() {
             number: '01',
             title: 'OptiWITS™',
             subtitle: 'Plateforme SaaS d\'optimisation de parcs éoliens',
-            year: '2025',
-            role: 'UX/UI Designer & Full-Stack Developer',
-            context: 'Stage M2 — GreenWITS',
+            year: '03/2025 -> 08/2025',
+            role: 'Full-Stack Developer & UX/UI Designer',
+            context: 'Stage M2 - GreenWITS',
             description: `
-                <p>OptiWITS™ est une plateforme SaaS innovante permettant aux exploitants de parcs éoliens d'optimiser la performance de leurs installations grâce à des algorithmes prédictifs et des visualisations de données avancées.</p>
-                <p>Ma mission : transformer une version bêta fonctionnelle en un produit commercialisable. J'ai mené la refonte complète de l'expérience utilisateur, repensé l'architecture front-end et implémenté de nouvelles fonctionnalités métier critiques.</p>
-                <p>Le défi principal était de rendre accessible une technologie complexe à des utilisateurs non-techniques, tout en conservant la profondeur d'analyse nécessaire aux experts.</p>
+                <p>OptiWITS™ est une plateforme SaaS qui accompagne la conception de parcs éoliens en combinant calculs d’optimisation et visualisations de données pour aider les équipes projet à prendre de meilleures décisions.</p>
+                <p>Dans le cadre de mon stage, mon rôle a été d’accélérer la transformation d’une version bêta en produit professionnel : montée en qualité de l’interface, clarification des parcours, et amélioration de la réactivité perçue au quotidien.</p>
+                <p>Concrètement, j’ai consolidé un design system, conçu/implémenté des composants UI réutilisables, et participé à l’industrialisation du front (structure, performances, micro-interactions) en lien étroit avec l’équipe produit/tech.</p>
+                <p>Le défi : rendre une technologie dense et très technique compréhensible et agréable à utiliser, sans perdre la précision attendue par des experts métier.</p>
+                <p>Ce que j’en retire : une meilleure maîtrise du travail en équipe sur un SaaS (priorisation, itération, feedback utilisateurs), et une approche plus mature de l’équilibre UX ↔ contraintes techniques ↔ performance.</p>
             `,
             tags: ['SAAS', 'UX/UI', 'FULL-STACK'],
-            stack: ['React', 'TypeScript', 'Python', 'PostgreSQL', 'Figma', 'Docker'],
-            links: {}
+            stack: ['React', 'JavaScript', 'Python', 'MongoDB', 'FastAPI', 'Figma', 'Docker', 'GitLab'],
+            links: []
         },
         ccp: {
             number: '02',
             title: 'Camping-Car Partner',
-            subtitle: 'Extranet B2B avec CRM intégré',
-            year: '2023 — 2024',
+            subtitle: 'Application web B2B de gestion de dossiers (CRM & collaboration)',
+            year: '05/2023 -> 10/2023 & 04/2024 -> 07/2024',
             role: 'Full-Stack Developer (Solo)',
             context: 'Stage Licence + Stage M1',
             description: `
-                <p>Conception et développement complet d'un extranet B2B pour Camping-Car Partner, intégrant un CRM sur-mesure pour la gestion de la relation client et des outils collaboratifs internes.</p>
-                <p>Particularité de ce projet : j'étais seul à porter l'ensemble du développement, de la phase de maquettage jusqu'au déploiement en production. Cette autonomie m'a permis de développer une vision globale du cycle de vie d'un projet.</p>
-                <p>Fonctionnalités clés : gestion des dossiers clients, outils de communication interne, tableaux de bord analytiques, système de notifications, et intégration avec les outils existants de l'entreprise.</p>
+                <p>Camping-Car Partner est une application web B2B (CRM / extranet) conçue pour centraliser et sécuriser la gestion de dossiers, et fluidifier la collaboration entre l’entreprise et ses partenaires (concessionnaires, téléconseillers).</p>
+                <p>J’ai travaillé sur ce même produit sur deux stages successifs (Licence puis Master 1) : d’abord pour bâtir une première version utilisable, puis pour faire évoluer l’outil avec les retours du terrain et accompagner la montée en charge.</p>
+                <p>En autonomie, j’ai assuré la conception UX/UI, le développement full-stack et la mise en production : structuration des données, pages métier, gestion des accès, fiabilisation et optimisation de l’expérience (réactivité, clarté des workflows, cohérence d’interface).</p>
+                <p>Le défi principal : transformer un fonctionnement “tableur + échanges dispersés” en un outil web simple à prendre en main, robuste et adapté à des utilisateurs aux profils variés, tout en garantissant la sécurité et la stabilité.</p>
+                <p>Ce que j’en retiens : une vision bout-en-bout d’un produit (besoin → solution → déploiement), le sens des priorités en contexte réel, et une progression nette sur la qualité logicielle (maintenance, performance, sécurité) et la communication avec des parties prenantes non-tech.</p>
             `,
             tags: ['B2B', 'CRM', 'PHP'],
-            stack: ['PHP', 'MySQL', 'JavaScript', 'jQuery', 'Bootstrap', 'Figma'],
-            links: {}
+            stack: ['PHP', 'MySQL', 'JavaScript', 'jQuery', 'Bootstrap', 'GitHub'],
+            links: [
+                { url: '#', label: 'Rapport de stage (PDF)', icon: 'file' }
+            ]
         },
         modnation: {
             number: '03',
@@ -553,26 +566,27 @@ function initProjectModal() {
                 <p>Stack technique moderne avec Laravel pour le backend robuste, React et TypeScript pour une interface réactive et typée, et MySQL pour la gestion des données relationnelles complexes.</p>
             `,
             tags: ['LARAVEL', 'REACT', 'TYPESCRIPT'],
-            stack: ['Laravel', 'React', 'TypeScript', 'MySQL', 'Tailwind CSS'],
-            links: {}
+            stack: ['Laravel', 'React', 'TypeScript', 'MySQL', 'Mantine', 'Figma'],
+            links: []
         },
         portfolio: {
             number: '04',
-            title: 'Portfolio 2024',
+            title: 'Portfolio 2025',
             subtitle: 'Vitrine numérique personnelle',
-            year: '2024',
+            year: '2025',
             role: 'Designer & Developer',
             context: 'Projet Personnel',
             description: `
-                <p>Mon premier portfolio professionnel, conçu pour présenter mon parcours hybride entre développement et design. Une vitrine qui reflète mon approche : technique solide, créativité assumée.</p>
+                <p>Mon ancien portfolio professionnel, conçu pour présenter mon parcours hybride entre développement et design. Une vitrine qui reflète mon approche : technique solide, créativité assumée.</p>
                 <p>Ce projet m'a permis d'explorer Three.js et les effets WebGL pour créer une expérience immersive unique avec un effet water-plane en arrière-plan.</p>
                 <p>L'architecture du site privilégie la performance et l'accessibilité tout en proposant des micro-interactions soignées.</p>
             `,
             tags: ['WEBGL', 'THREE.JS', 'DESIGN'],
-            stack: ['HTML/CSS', 'JavaScript', 'Three.js', 'GSAP', 'Figma'],
-            links: {
-                github: 'https://github.com/Leo-BERNARD38/Portfolio-2025'
-            }
+            stack: ['HTML/CSS', 'JavaScript', 'Three.js', 'WebGL', 'Figma'],
+            links: [
+                { url: 'https://leo-bernard38.github.io/Portfolio-2025/', label: 'Portfolio 2025', icon: 'link' },
+                { url: 'https://github.com/Leo-BERNARD38/Portfolio-2025', label: 'Code Source', icon: 'link' }
+            ]
         },
         secret: {
             number: '05',
@@ -580,33 +594,33 @@ function initProjectModal() {
             subtitle: 'Plateforme communautaire innovante',
             year: '2025',
             role: 'Co-fondateur & Lead Developer',
-            context: 'Startup en développement',
+            context: 'Projet entre camarades',
             description: `
                 <p>Un projet ambitieux lancé début 2025 avec un camarade de promotion : créer une plateforme communautaire révolutionnaire pour partager les meilleurs bons plans régionaux.</p>
                 <p>L'innovation ? Une intelligence artificielle personnalisée qui analyse les préférences utilisateurs pour suggérer des recommandations pertinentes et contextuelles.</p>
                 <p>Ce laboratoire d'innovation privé nous permet d'explorer les limites des technologies actuelles tout en construisant un produit avec un réel potentiel commercial. Plus d'infos bientôt... 👀</p>
             `,
-            tags: ['STARTUP', 'IA', 'REACT'],
-            stack: ['Next.js', 'TypeScript', 'Python', 'OpenAI API', 'MongoDB', 'Figma'],
-            links: {}
+            tags: ['STARTUP', 'IA', 'REACT', 'Python'],
+            stack: ['React', 'TypeScript', 'Python', 'Mistral API', 'MySQL', 'Figma'],
+            links: []
         },
         youtube: {
             number: '06',
             title: 'YouTube @WNT',
             subtitle: 'Création de contenu vidéo & VFX',
-            year: '2016 — Présent',
+            year: '2016 - Présent',
             role: 'Créateur & Monteur',
             context: 'Projet Personnel',
             description: `
                 <p>Depuis 2016, je développe ma chaîne YouTube où j'explore la création de contenu sous toutes ses formes : montage vidéo, effets visuels, storytelling et motion design.</p>
                 <p>Ce projet personnel m'a permis de maîtriser la Suite Adobe (Premiere Pro, After Effects, Photoshop) et de développer un œil créatif qui nourrit aujourd'hui mon travail en UX/UI design.</p>
-                <p>Au-delà des compétences techniques, cette expérience m'a appris l'importance du rythme, de la narration et de l'engagement utilisateur — des concepts directement transposables au design d'interfaces.</p>
+                <p>Au-delà des compétences techniques, cette expérience m'a appris l'importance du rythme, de la narration et de l'engagement utilisateur - des concepts directement transposables au design d'interfaces.</p>
             `,
-            tags: ['MOTION', 'AFTER EFFECTS', 'PREMIERE PRO'],
-            stack: ['After Effects', 'Premiere Pro', 'Photoshop', 'Audition', 'Blender'],
-            links: {
-                site: 'https://www.youtube.com/@WNT_38'
-            }
+            tags: ['PREMIERE PRO', 'AFTER EFFECTS', 'MOTION DESIGN'],
+            stack: ['After Effects', 'Premiere Pro', 'Photoshop', 'Audition', 'Filmora', 'Topaz Labs'],
+            links: [
+                { url: 'https://www.youtube.com/@WNT_38', label: 'YouTube @WNT', icon: 'link' }
+            ]
         }
     };
     
@@ -654,21 +668,69 @@ function initProjectModal() {
             `<span class="tag mono-text">${tech}</span>`
         ).join('');
         
-        const siteLink = modal.querySelector('.project-modal__link--site');
-        const githubLink = modal.querySelector('.project-modal__link--github');
+        const linksContainer = modal.querySelector('.project-modal__links');
+        const linksWrapper = modal.querySelector('.project-modal__links-container');
         
-        if (project.links.site) {
-            siteLink.href = project.links.site;
-            siteLink.style.display = 'inline-flex';
-        } else {
-            siteLink.style.display = 'none';
-        }
-        
-        if (project.links.github) {
-            githubLink.href = project.links.github;
-            githubLink.style.display = 'inline-flex';
-        } else {
-            githubLink.style.display = 'none';
+        if (linksContainer && linksWrapper) {
+            linksContainer.innerHTML = '';
+            
+            if (project.links && Array.isArray(project.links) && project.links.length > 0) {
+                linksWrapper.style.display = 'block';
+                
+                project.links.forEach((link) => {
+                    const btn = document.createElement('a');
+                    btn.href = link.url;
+                    btn.target = '_blank';
+                    btn.className = 'project-modal__sidebar-link';
+                    
+                    let iconSvg = '';
+                    if (link.icon === 'file') {
+                        iconSvg = `
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                                <polyline points="13 2 13 9 20 9"/>
+                            </svg>
+                        `;
+                    } else {
+                        // Default to link icon
+                        iconSvg = `
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                <polyline points="15 3 21 3 21 9"/>
+                                <line x1="10" y1="14" x2="21" y2="3"/>
+                            </svg>
+                        `;
+                    }
+                    
+                    btn.innerHTML = `
+                        ${iconSvg}
+                        <span>${link.label}</span>
+                    `;
+                    
+                    // Add hover effect for custom cursor
+                    btn.addEventListener('mouseenter', () => {
+                        const cursor = document.querySelector('.cursor');
+                        const follower = document.querySelector('.cursor-follower');
+                        if (cursor && follower) {
+                            cursor.classList.add('active');
+                            follower.classList.add('active');
+                        }
+                    });
+                    
+                    btn.addEventListener('mouseleave', () => {
+                        const cursor = document.querySelector('.cursor');
+                        const follower = document.querySelector('.cursor-follower');
+                        if (cursor && follower) {
+                            cursor.classList.remove('active');
+                            follower.classList.remove('active');
+                        }
+                    });
+                    
+                    linksContainer.appendChild(btn);
+                });
+            } else {
+                linksWrapper.style.display = 'none';
+            }
         }
     }
     

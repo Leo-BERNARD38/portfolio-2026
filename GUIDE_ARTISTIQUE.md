@@ -1,7 +1,7 @@
 # GUIDE DE DIRECTION ARTISTIQUE - PORTFOLIO 2026
 **Vision :** L'Architecte Digital // Editorial Minimalist Tech  
 **Cible :** Clients Premium, Agences Awwwards, Recruteurs Tech  
-**Version :** 2.0 — Mise à jour UX/UI
+**Version :** 2.0 - Mise à jour UX/UI
 
 ---
 
@@ -13,10 +13,10 @@ L'interface doit **respirer**. Chaque élément existe pour une raison. On reche
 - L'**espace** comme élément de design à part entière
 
 ### Principes Fondamentaux
-1. **Whitespace is king** — L'espace vide guide le regard
-2. **Contraste assumé** — Des hiérarchies typographiques marquées
-3. **Grille visible** — Structure apparente mais élégante
-4. **Mouvement subtil** — Micro-interactions raffinées
+1. **Whitespace is king** - L'espace vide guide le regard
+2. **Contraste assumé** - Des hiérarchies typographiques marquées
+3. **Grille visible** - Structure apparente mais élégante
+4. **Mouvement subtil** - Micro-interactions raffinées
 
 * **Mots-clés :** Rigueur, Respiration, Typographie Cinétique, Matériaux Nobles
 * **Anti-patterns :** Surcharge, Uniformité, Animations excessives
