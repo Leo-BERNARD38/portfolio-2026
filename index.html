@@ -300,15 +300,19 @@
                     "Un code créatif et un design réfléchi."
                 </p>
                 <div class="hero__cta">
-                    <a href="#work" class="btn btn--primary magnetic-btn">
-                        <span>Voir les projets</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </a>
-                    <a href="assets/files/CV_BERNARD_Leo_2025.pdf" target="_blank" class="btn btn--secondary">
-                        Télécharger CV
-                    </a>
+                    <div class="btn-wrapper" data-bg-text="PROJETS">
+                        <a href="#work" class="btn btn--primary">
+                            <span>Voir les projets</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="btn-wrapper" data-bg-text="CV">
+                        <a href="assets/files/CV_BERNARD_Leo_2025.pdf" target="_blank" class="btn btn--secondary">
+                            <span>Télécharger CV</span>
+                        </a>
+                    </div>
                 </div>
                 <div class="hero__stats">
                     <div class="stat">
@@ -625,66 +629,108 @@
 
     <!-- Testimonials -->
     <section class="testimonials">
-        <div class="section-header section-header--center">
-            <div class="section-header__label">
-                <span class="mono-text">04</span>
-                <span class="mono-text">TESTIMONIALS</span>
+        <div class="testimonials__bg-quote">"</div>
+        
+        <div class="testimonials__content">
+            <div class="testimonials__header">
+                <p class="testimonials__label mono-text">
+                    <span class="testimonials__label-line"></span>
+                    04 — Recommandations
+                </p>
             </div>
-            <h2 class="section-header__title">Ce qu'ils <em>disent</em></h2>
-        </div>
-
-        <div class="testimonials__slider">
-            <div class="testimonial">
-                <blockquote class="testimonial__quote">
-                    Léo a su faire progresser Camping-Car Partner en proposant de lui-même des solutions innovantes. 
-                    Un très gros bagage technique et une rapidité d'exécution remarquables.
+            
+            <div class="testimonials__main">
+                <blockquote class="testimonials__quote">
+                    <span class="testimonials__quote-line">Léo a su faire progresser</span>
+                    <span class="testimonials__quote-line"><em>Camping-Car Partner</em> en proposant</span>
+                    <span class="testimonials__quote-line">de lui-même des solutions <em>innovantes</em>.</span>
                 </blockquote>
-                <div class="testimonial__author">
-                    <div class="testimonial__info">
-                        <span class="testimonial__name">Philippe MOREL</span>
-                        <span class="testimonial__role mono-text">CO-GÉRANT, CAMPING-CAR PARTNER</span>
-                    </div>
+                
+                <p class="testimonials__subquote">
+                    Un très gros bagage technique et une rapidité d'exécution remarquables.
+                </p>
+            </div>
+            
+            <div class="testimonials__footer">
+                <div class="testimonials__author">
+                    <span class="testimonials__name">Philippe MOREL</span>
+                    <span class="testimonials__role mono-text">Co-gérant — Camping-Car Partner</span>
                 </div>
+                <div class="testimonials__decoration"></div>
             </div>
         </div>
     </section>
 
     <!-- Contact Section -->
     <section id="contact" class="contact">
-        <div class="contact__wrapper">
-            <div class="section-header section-header--center">
-                <div class="section-header__label">
-                    <span class="mono-text">05</span>
-                    <span class="mono-text">CONTACT</span>
+        <div class="contact__bg-text">CONTACT</div>
+        
+        <div class="contact__decorations">
+            <div class="contact__decoration contact__decoration--1"></div>
+            <div class="contact__decoration contact__decoration--2"></div>
+        </div>
+
+        <div class="contact__content">
+            <div class="contact__main">
+                <p class="contact__label mono-text">
+                    <span class="contact__label-line"></span>
+                    05 — Let's Connect
+                </p>
+                <h2 class="contact__title">
+                    <span class="contact__title-line">Une idée,</span>
+                    <span class="contact__title-line">un <em>projet</em> ?</span>
+                </h2>
+            </div>
+            
+            <div class="contact__aside">
+                <p class="contact__description">
+                    Disponible pour de nouvelles collaborations.<br>
+                    Réponse garantie sous 24h.
+                </p>
+                <div class="contact__cta">
+                    <div class="btn-wrapper" data-bg-text="EMAIL">
+                        <a href="mailto:leobernard712@gmail.com" class="btn btn--primary btn--large">
+                            <span>leobernard712@gmail.com</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="contact__links">
+                    <a href="https://www.linkedin.com/in/léo-bernard-wnt/" target="_blank" class="contact__link">
+                        <span>LinkedIn</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </a>
+                    <a href="https://github.com/Leo-BERNARD38" target="_blank" class="contact__link">
+                        <span>GitHub</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </a>
+                    <a href="tel:+33674359867" class="contact__link">
+                        <span>+33 6 74 35 98 67</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
-            <h2 class="contact__title">
-                Une idée, un projet ?<br>
-                <em>Discutons</em>
-            </h2>
-            <p class="contact__subtitle">
-                Disponible immédiatement, étudie toutes opportunités.
-            </p>
-
-            <div class="contact__cta">
-                <a href="mailto:leobernard712@gmail.com" class="btn btn--large magnetic-btn">
-                    <span>leobernard712@gmail.com</span>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                    </svg>
-                </a>
+        </div>
+        
+        <div class="contact__footer">
+            <div class="contact__status">
+                <span class="contact__status-dot"></span>
+                <span class="mono-text">Disponible</span>
             </div>
-
-            <div class="contact__socials">
-                <a href="https://www.linkedin.com/in/léo-bernard-wnt/" target="_blank" class="social-link">
-                    <span class="mono-text">LINKEDIN</span>
-                </a>
-                <a href="https://github.com/Leo-BERNARD38" target="_blank" class="social-link">
-                    <span class="mono-text">GITHUB</span>
-                </a>
-                <a href="tel:+33674359867" class="social-link">
-                    <span class="mono-text">06 74 35 98 67</span>
-                </a>
+            <div class="contact__location mono-text">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                Saint-Étienne, FR
             </div>
         </div>
     </section>

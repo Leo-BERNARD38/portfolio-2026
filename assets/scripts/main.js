@@ -17,11 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initFullscreenMenu();
     initRevealAnimations();
-    initMagneticElements(isTouchDevice);
     PageTransition.init();
     initProjectModal();
     initParallax();
     initServiceCardsGlow(isTouchDevice);
+    initButtonGlow(isTouchDevice);
     initBentoGlow(isTouchDevice);
     initLightbox();
 });
@@ -369,41 +369,6 @@ function initRevealAnimations() {
             
             sectionObserver.observe(el);
         }
-    });
-}
-
-/* ----------------------------------------
-   Magnetic Elements
-   ---------------------------------------- */
-function initMagneticElements(isTouchDevice) {
-    const magneticElements = document.querySelectorAll('.magnetic-btn, .nav__link--cta');
-    
-    if (isTouchDevice || window.matchMedia('(max-width: 1024px)').matches) return;
-    
-    magneticElements.forEach(el => {
-        let rect = null;
-
-        el.addEventListener('mouseenter', () => {
-            rect = el.getBoundingClientRect();
-            el.style.transition = 'transform 0.1s ease';
-        });
-
-        el.addEventListener('mousemove', (e) => {
-            if (!rect) return;
-            
-            // Use RAF to prevent layout thrashing
-            requestAnimationFrame(() => {
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-                el.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
-            });
-        });
-        
-        el.addEventListener('mouseleave', () => {
-            rect = null;
-            el.style.transform = 'translate(0, 0)';
-            el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-        });
     });
 }
 
@@ -933,6 +898,38 @@ function initServiceCardsGlow(isTouchDevice) {
             
             card.style.setProperty('--mouse-x', `${x}%`);
             card.style.setProperty('--mouse-y', `${y}%`);
+        });
+    });
+}
+
+/* ----------------------------------------
+   Button Glow Effect (follows cursor)
+   ---------------------------------------- */
+function initButtonGlow(isTouchDevice) {
+    if (isTouchDevice) return;
+    
+    const wrappers = document.querySelectorAll('.btn-wrapper');
+    const PARALLAX_STRENGTH = 20; // pixels
+    
+    wrappers.forEach(wrapper => {
+        wrapper.addEventListener('mousemove', (e) => {
+            const rect = wrapper.getBoundingClientRect();
+            // Normalize to -1 to 1 range (center = 0)
+            const normalizedX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+            const normalizedY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+            
+            // Inverse parallax: mouse goes right, text goes left
+            const translateX = -normalizedX * PARALLAX_STRENGTH;
+            const translateY = -normalizedY * PARALLAX_STRENGTH;
+            
+            wrapper.style.setProperty('--translate-x', `${translateX}px`);
+            wrapper.style.setProperty('--translate-y', `${translateY}px`);
+        });
+        
+        wrapper.addEventListener('mouseleave', () => {
+            // Smooth return to center
+            wrapper.style.setProperty('--translate-x', '0px');
+            wrapper.style.setProperty('--translate-y', '0px');
         });
     });
 }
