@@ -90,6 +90,7 @@
             inset: 0;
             background-color: var(--color-accent);
             clip-path: polygon(100% 0, 100% 0, 100% 0);
+            will-change: clip-path;
             animation: panelReveal 1.4s var(--ease-out-expo) 0.2s forwards;
         }
         @keyframes panelReveal {
@@ -111,6 +112,7 @@
             display: inline-block;
             opacity: 0;
             transform: translateY(60px);
+            will-change: transform, opacity;
         }
         .loader__letter--l { animation: letterReveal 1s var(--ease-out-expo) 0.6s forwards; }
         .loader__letter--b { animation: letterReveal 1s var(--ease-out-expo) 0.7s forwards; }

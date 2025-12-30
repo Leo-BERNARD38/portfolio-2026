@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     PageTransition.init();
     initProjectModal();
     initParallax();
-    initTextAnimations();
     initServiceCardsGlow(isTouchDevice);
     initBentoGlow(isTouchDevice);
     initLightbox();
@@ -382,21 +381,28 @@ function initMagneticElements(isTouchDevice) {
     if (isTouchDevice || window.matchMedia('(max-width: 1024px)').matches) return;
     
     magneticElements.forEach(el => {
+        let rect = null;
+
+        el.addEventListener('mouseenter', () => {
+            rect = el.getBoundingClientRect();
+            el.style.transition = 'transform 0.1s ease';
+        });
+
         el.addEventListener('mousemove', (e) => {
-            const rect = el.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
+            if (!rect) return;
             
-            el.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            // Use RAF to prevent layout thrashing
+            requestAnimationFrame(() => {
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                el.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
         });
         
         el.addEventListener('mouseleave', () => {
+            rect = null;
             el.style.transform = 'translate(0, 0)';
             el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-        });
-        
-        el.addEventListener('mouseenter', () => {
-            el.style.transition = 'transform 0.1s ease';
         });
     });
 }
@@ -431,26 +437,6 @@ function initParallax() {
             });
             ticking = true;
         }
-    });
-}
-
-/* ----------------------------------------
-   Text Animations
-   ---------------------------------------- */
-function initTextAnimations() {
-    // Split text animation for hero title
-    const heroTitleLines = document.querySelectorAll('.hero__title-line');
-    
-    heroTitleLines.forEach(line => {
-        // Preserve inline markup (<em>, <u>, etc.) by wrapping existing nodes.
-        // Also keep it idempotent if called multiple times.
-        if (line.childNodes.length === 1 && line.firstElementChild?.tagName === 'SPAN') return;
-
-        const wrapper = document.createElement('span');
-        while (line.firstChild) {
-            wrapper.appendChild(line.firstChild);
-        }
-        line.appendChild(wrapper);
     });
 }
 
