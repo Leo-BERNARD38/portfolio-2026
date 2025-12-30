@@ -671,23 +671,6 @@ em {
     gap: var(--space-md);
 }
 
-.hero__badge-creative {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--color-accent);
-    font-size: 10px;
-    font-weight: 600;
-    margin-bottom: var(--space-xs);
-}
-
-.hero__badge-separator {
-    width: 30px;
-    height: 1px;
-    background-color: var(--color-accent);
-    opacity: 0.5;
-}
-
 .hero__label {
     display: inline-flex;
     align-items: center;
