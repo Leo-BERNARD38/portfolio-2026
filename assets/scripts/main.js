@@ -8,18 +8,22 @@
 initLoader();
 
 document.addEventListener('DOMContentLoaded', () => {
-    initCustomCursor();
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches || 
+                          'ontouchstart' in window || 
+                          navigator.maxTouchPoints > 0;
+
+    initCustomCursor(isTouchDevice);
     initSmoothScroll();
     initNavigation();
     initFullscreenMenu();
     initRevealAnimations();
-    initMagneticElements();
+    initMagneticElements(isTouchDevice);
     PageTransition.init();
     initProjectModal();
     initParallax();
     initTextAnimations();
-    initServiceCardsGlow();
-    initBentoGlow();
+    initServiceCardsGlow(isTouchDevice);
+    initBentoGlow(isTouchDevice);
     initLightbox();
 });
 
@@ -117,14 +121,14 @@ function animateHeroEntrance() {
 /* ----------------------------------------
    Custom Cursor
    ---------------------------------------- */
-function initCustomCursor() {
+function initCustomCursor(isTouchDevice) {
     const cursor = document.querySelector('.cursor');
     const follower = document.querySelector('.cursor-follower');
     
     if (!cursor || !follower) return;
     
     // Check for touch device or no hover capability
-    if (window.matchMedia('(hover: none)').matches) {
+    if (isTouchDevice) {
         cursor.style.display = 'none';
         follower.style.display = 'none';
         return;
@@ -372,10 +376,10 @@ function initRevealAnimations() {
 /* ----------------------------------------
    Magnetic Elements
    ---------------------------------------- */
-function initMagneticElements() {
+function initMagneticElements(isTouchDevice) {
     const magneticElements = document.querySelectorAll('.magnetic-btn, .nav__link--cta');
     
-    if (window.matchMedia('(max-width: 1024px)').matches) return;
+    if (isTouchDevice || window.matchMedia('(max-width: 1024px)').matches) return;
     
     magneticElements.forEach(el => {
         el.addEventListener('mousemove', (e) => {
@@ -930,7 +934,9 @@ function openLightbox(src, alt) {
 /* ----------------------------------------
    Service Cards Glow Effect
    ---------------------------------------- */
-function initServiceCardsGlow() {
+function initServiceCardsGlow(isTouchDevice) {
+    if (isTouchDevice) return;
+    
     const cards = document.querySelectorAll('.service-card');
     
     cards.forEach(card => {
@@ -946,7 +952,9 @@ function initServiceCardsGlow() {
 }
 
 // Bento Items Glow Effect
-function initBentoGlow() {
+function initBentoGlow(isTouchDevice) {
+    if (isTouchDevice) return;
+    
     const bentoItems = document.querySelectorAll('.bento-item');
     
     bentoItems.forEach(item => {

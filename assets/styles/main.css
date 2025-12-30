@@ -179,9 +179,12 @@ ul, ol {
     border-color: var(--color-accent);
 }
 
-@media (hover: none) {
+@media (hover: none), (pointer: coarse) {
     .cursor, .cursor-follower {
         display: none !important;
+    }
+    body {
+        cursor: auto !important;
     }
 }
 
