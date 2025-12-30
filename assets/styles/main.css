@@ -1721,13 +1721,6 @@ em {
     gap: var(--space-md);
 }
 
-.testimonial__avatar {
-    width: 60px;
-    height: 60px;
-    background-color: var(--color-white);
-    border-radius: 50%;
-}
-
 .testimonial__info {
     text-align: left;
 }
@@ -1761,7 +1754,7 @@ em {
 }
 
 .contact__title {
-    font-size: var(--text-5xl);
+    font-size: var(--text-4xl);
     margin-bottom: var(--space-lg);
     line-height: 1.1;
 }
