@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initButtonGlow(isTouchDevice);
     initBentoGlow(isTouchDevice);
     initLightbox();
+    initServicesCarousel();
 });
 
 /* ----------------------------------------
@@ -950,6 +951,97 @@ function initBentoGlow(isTouchDevice) {
             item.style.setProperty('--mouse-y', `${y}%`);
         });
     });
+}
+
+/* ----------------------------------------
+   Services Carousel Navigation
+   ---------------------------------------- */
+function initServicesCarousel() {
+    const grid = document.querySelector('.services__grid');
+    const dots = document.querySelectorAll('.services__dot');
+    const prevBtn = document.querySelector('.services__nav-btn--prev');
+    const nextBtn = document.querySelector('.services__nav-btn--next');
+    const cards = document.querySelectorAll('.service-card');
+    
+    if (!grid || !dots.length || !cards.length) return;
+    
+    let currentIndex = 0;
+    const totalCards = cards.length;
+    
+    // Update active dot
+    const updateDots = (index) => {
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+    };
+    
+    // Scroll to card
+    const scrollToCard = (index) => {
+        if (index < 0) index = 0;
+        if (index >= totalCards) index = totalCards - 1;
+        
+        currentIndex = index;
+        const card = cards[index];
+        
+        if (card) {
+            card.scrollIntoView({
+                behavior: 'smooth',
+                inline: 'center',
+                block: 'nearest'
+            });
+        }
+        
+        updateDots(currentIndex);
+    };
+    
+    // Dot clicks
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            scrollToCard(index);
+        });
+    });
+    
+    // Arrow clicks
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            scrollToCard(currentIndex - 1);
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            scrollToCard(currentIndex + 1);
+        });
+    }
+    
+    // Detect scroll and update dots
+    let scrollTimeout;
+    grid.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const gridRect = grid.getBoundingClientRect();
+            const gridCenter = gridRect.left + gridRect.width / 2;
+            
+            let closestIndex = 0;
+            let closestDistance = Infinity;
+            
+            cards.forEach((card, index) => {
+                const cardRect = card.getBoundingClientRect();
+                const cardCenter = cardRect.left + cardRect.width / 2;
+                const distance = Math.abs(gridCenter - cardCenter);
+                
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestIndex = index;
+                }
+            });
+            
+            if (closestIndex !== currentIndex) {
+                currentIndex = closestIndex;
+                updateDots(currentIndex);
+            }
+        }, 50);
+    }, { passive: true });
 }
 
 /* ----------------------------------------
