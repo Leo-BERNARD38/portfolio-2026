@@ -1754,7 +1754,7 @@ em {
     
     /* Skills en grille 2 colonnes sur mobile */
     .about__skills {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
         gap: var(--space-md);
     }
     
@@ -1763,9 +1763,27 @@ em {
         margin-bottom: var(--space-sm);
     }
     
-    .skill-group__list li {
+    .skill-group__list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    /* Increased specificity to override desktop styles */
+    .about__skills .skill-group__list li {
         font-size: var(--text-sm);
-        padding: var(--space-xs) 0;
+        padding: 6px 12px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 4px;
+        /* Reset any conflicting styles */
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Disable hover animation on mobile */
+    .about__skills .skill-group__list li:hover {
+        padding-left: 12px;
+        background: rgba(255,255,255,0.08);
     }
 }
 
@@ -1837,6 +1855,7 @@ em {
     .services__grid {
         display: flex;
         overflow-x: auto;
+        overflow-y: hidden;
         scroll-snap-type: x mandatory;
         gap: var(--space-md);
         padding: 0 var(--container-padding);
@@ -1853,8 +1872,10 @@ em {
     .service-card {
         flex: 0 0 85vw;
         max-width: 85vw;
+        min-height: auto;
         scroll-snap-align: center;
         padding: var(--space-xl) var(--space-lg);
+        overflow: hidden;
     }
     
     .service-card__number {
@@ -2580,9 +2601,10 @@ em {
 
 @media (max-width: 640px) {
     .contact__footer {
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: center;
         gap: var(--space-md);
-        align-items: flex-start;
+        flex-wrap: wrap;
     }
 }
 
@@ -2595,10 +2617,18 @@ em {
     
     .contact__bg-text {
         font-size: clamp(5rem, 18vw, 12rem);
+        opacity: 0.03;
+        top: 50%;
+        transform: translateY(-50%);
     }
     
     .contact__content {
         gap: var(--space-xl);
+        text-align: center;
+    }
+
+    .contact__main {
+        align-items: center;
     }
     
     .contact__title {
@@ -2610,11 +2640,22 @@ em {
         font-size: var(--text-sm);
         max-width: 100%;
         line-height: 1.6;
+        margin-inline: auto;
+    }
+
+    .contact__aside {
+        align-items: center;
     }
     
     .contact__cta {
         flex-direction: column;
         width: 100%;
+        align-items: center;
+    }
+    
+    .contact__links {
+        justify-content: center;
+        flex-direction: row;
     }
     
     .contact__cta .btn-wrapper {
@@ -2731,24 +2772,30 @@ em {
     }
     
     .footer__grid {
-        grid-template-columns: repeat(2, 1fr);
-        text-align: left;
-        gap: var(--space-lg);
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: var(--space-xl);
     }
     
     /* Logo column spans full width */
     .footer__col:first-child {
-        grid-column: span 2;
+        grid-column: span 1;
         display: flex;
+        flex-direction: column;
         align-items: center;
         gap: var(--space-md);
         padding-bottom: var(--space-md);
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         margin-bottom: var(--space-sm);
+        text-align: center;
     }
     
     .footer__col:first-child .footer__logo-img {
         margin-bottom: 0;
+    }
+
+    .footer__nav {
+        align-items: center;
     }
     
     .footer__bottom {
@@ -3524,5 +3571,26 @@ em {
     .service-card__list li::before {
         opacity: 1;
         transform: scale(1);
+    }
+}
+
+/* ----------------------------------------
+   Mobile Typography & Layout Fixes (User Request)
+   ---------------------------------------- */
+@media (max-width: 768px) {
+    /* Titres plus grands pour meilleur contraste */
+    .section-header__title,
+    h2 {
+        font-size: clamp(3rem, 10vw, 4rem) !important;
+        line-height: 1.1;
+    }
+    
+    .hero__title {
+        font-size: clamp(3.5rem, 12vw, 5rem) !important;
+    }
+    
+    /* Fix padding général pour éviter que le contenu touche les bords */
+    .about, .work, .services, .contact {
+        padding-inline: var(--space-md);
     }
 }
