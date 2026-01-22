@@ -258,10 +258,36 @@ em {
 .nav {
     display: flex;
     align-items: center;
-    justify-content: end;
+    justify-content: space-between;
     max-width: 1800px;
     margin: 0 auto;
     pointer-events: auto;
+}
+
+.nav__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--color-white);
+    transition: transform 0.3s var(--ease-out-expo);
+    z-index: 2;
+}
+
+.nav__logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.nav__name {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Hero Spacer to push content down */
+.hero__spacer {
+    height: 80px;
 }
 
 /* Desktop Nav Links - Pill Container */
@@ -300,7 +326,7 @@ em {
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.5);
     position: relative;
-    padding: 10px 14px;
+    padding: 6px 14px;
     border-radius: 8px;
     transition: all 0.3s var(--ease-out-expo);
 }
@@ -314,18 +340,6 @@ em {
 .nav__link.active {
     color: var(--color-white);
     background-color: rgba(255, 255, 255, 0.08);
-}
-
-.nav__link.active::after {
-    content: '';
-    position: absolute;
-    bottom: 6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 4px;
-    background-color: var(--color-accent);
-    border-radius: 50%;
 }
 
 /* CTA Button - Plus subtil */
@@ -591,57 +605,6 @@ em {
     overflow: hidden;
 }
 
-.hero__top-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
-    max-width: 1800px;
-    margin: 0 auto;
-    z-index: 10;
-}
-
-.hero__name-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-}
-
-.hero__name {
-    font-size: var(--text-sm);
-    color: var(--color-white);
-    font-weight: 600;
-}
-
-.hero__status {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-white-muted);
-    background: rgba(255, 255, 255, 0.03);
-    padding: 4px 10px;
-    border-radius: 100px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.hero__status-dot {
-    width: 6px;
-    height: 6px;
-    background-color: var(--color-accent);
-    border-radius: 50%;
-    box-shadow: 0 0 10px var(--color-accent);
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.2); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
 .hero__location {
     display: flex;
     align-items: center;
@@ -822,12 +785,6 @@ em {
     
     .hero__scroll {
         display: none;
-    }
-    
-    .hero__top-info {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-md);
     }
     
     .hero__content {

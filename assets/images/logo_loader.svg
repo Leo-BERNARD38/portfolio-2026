@@ -1,0 +1,13 @@
+<svg width="200" height="200" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(50 50)" stroke="#0a0a0a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" />
+
+    <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(90)" />
+
+    <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(180)" />
+
+    <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(270)" />
+    
+  </g>
+</svg>

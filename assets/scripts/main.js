@@ -36,68 +36,98 @@ function initLoader() {
     const loader = document.getElementById('loader');
     if (!loader) return;
     
-    const MIN_LOADER_TIME = 2000;
-    const loaderStartTime = Date.now();
-    
     const progressBar = loader.querySelector('.loader__progress-bar');
-    let progress = progressBar ? parseInt(progressBar.style.width) || 0 : 0;
+    const percentText = loader.querySelector('.loader__percent');
     
-    const updateProgress = (value) => {
-        progress = Math.min(value, 100);
-        if (progressBar) {
-            progressBar.style.width = `${progress}%`;
+    const MIN_LOADER_TIME = 2500;
+    const loaderStartTime = Date.now();
+    let progress = 0;
+    let targetProgress = 0;
+    let animationFrame = null;
+    
+    // Déclencher l'animation du SVG
+    setTimeout(() => {
+        loader.classList.add('is-animating');
+    }, 100);
+    
+    const updateProgressSmooth = () => {
+        const diff = targetProgress - progress;
+        // On accélère l'attrape si on est loin, on ralentit si on est proche
+        const factor = diff > 10 ? 0.1 : 0.05;
+        progress += diff * factor;
+        
+        const displayProgress = Math.min(Math.round(progress), 100);
+        if (progressBar) progressBar.style.width = `${progress}%`;
+        if (percentText) percentText.textContent = `${displayProgress}%`;
+        
+        if (Math.abs(diff) > 0.05) {
+            animationFrame = requestAnimationFrame(updateProgressSmooth);
+        } else {
+            animationFrame = null;
         }
     };
     
+    // Simulation temporelle plus précise
+    const duration = 2200; // Temps pour atteindre 90%
+    const startSim = Date.now();
+    
+    const simulate = () => {
+        const elapsed = Date.now() - startSim;
+        const ratio = Math.min(elapsed / duration, 1);
+        
+        // Courbe de progression (accélère puis ralentit vers la fin)
+        const easeRatio = 1 - Math.pow(1 - ratio, 2); 
+        targetProgress = easeRatio * 92;
+        
+        if (!animationFrame) {
+            animationFrame = requestAnimationFrame(updateProgressSmooth);
+        }
+        
+        if (ratio < 1) {
+            setTimeout(simulate, 50);
+        }
+    };
+    
+    simulate();
+    
     const hideLoader = () => {
-        if (window.loaderInterval) clearInterval(window.loaderInterval);
         const elapsedTime = Date.now() - loaderStartTime;
         const remainingTime = Math.max(0, MIN_LOADER_TIME - elapsedTime);
         
+        // Attendre le délai minimal ET la fin du chargement réel
         setTimeout(() => {
-            loader.classList.add('loaded');
-            document.body.classList.remove('loading');
+            targetProgress = 100;
+            if (!animationFrame) {
+                animationFrame = requestAnimationFrame(updateProgressSmooth);
+            }
             
-            // Trigger hero animations after loader
+            // Petit délai pour laisser la barre finir son animation à 100%
             setTimeout(() => {
-                animateHeroEntrance();
-            }, 200);
-            
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 1000);
+                loader.classList.add('loaded');
+                document.body.classList.remove('loading');
+                
+                setTimeout(() => {
+                    animateHeroEntrance();
+                }, 200);
+                
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    if (animationFrame) cancelAnimationFrame(animationFrame);
+                }, 800);
+            }, 500);
         }, remainingTime);
     };
     
     window.addEventListener('load', () => {
-        updateProgress(100);
         hideLoader();
     });
     
     // Fallback
     setTimeout(() => {
         if (!loader.classList.contains('loaded')) {
-            updateProgress(100);
             hideLoader();
         }
-    }, 5000);
-    
-    // Progress simulation
-    if (window.loaderInterval) clearInterval(window.loaderInterval);
-    
-    let simulatedProgress = progress;
-    const simulateProgress = setInterval(() => {
-        const increment = Math.random() * 15;
-        simulatedProgress += increment;
-        
-        if (simulatedProgress < 90) {
-            updateProgress(simulatedProgress);
-        }
-        
-        if (simulatedProgress >= 100) {
-            clearInterval(simulateProgress);
-        }
-    }, 100);
+    }, 8000);
 }
 
 /* ----------------------------------------
@@ -512,8 +542,13 @@ function initProjectModal() {
             `,
             tags: ['B2B', 'CRM', 'PHP'],
             stack: ['PHP', 'MySQL', 'JavaScript', 'jQuery', 'Bootstrap', 'GitHub'],
-            images: [],
-            links: []
+            images: [
+                'assets/images/project_ccp_1.webp',
+                'assets/images/project_ccp_2.webp',
+            ],
+            links: [
+                { url : 'https://campingcarpartner.fr/', label: 'Camping-Car Partner', icon: 'link' }
+            ]
         },
         modnation: {
             number: '03',
@@ -529,8 +564,15 @@ function initProjectModal() {
             `,
             tags: ['LARAVEL', 'REACT', 'TYPESCRIPT'],
             stack: ['Laravel', 'React', 'TypeScript', 'MySQL', 'Mantine', 'Figma'],
-            images: [],
-            links: []
+            images: [
+                'assets/images/project_modnation_1.webp',
+                'assets/images/project_modnation_2.webp',
+                'assets/images/project_modnation_3.webp',
+                'assets/images/project_modnation_4.webp',
+            ],
+            links: [
+                { url : 'https://modnation.fr', label: 'ModNation', icon: 'link' }
+            ]
         },
         portfolio: {
             number: '04',
