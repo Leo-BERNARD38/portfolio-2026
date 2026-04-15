@@ -68,7 +68,7 @@ function initLoader() {
     };
     
     // Simulation temporelle plus précise
-    const duration = 2200; // Temps pour atteindre 90%
+    const duration = 1200; // Temps pour atteindre 90%
     const startSim = Date.now();
     
     const simulate = () => {
