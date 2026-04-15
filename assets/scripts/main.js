@@ -39,7 +39,7 @@ function initLoader() {
     const progressBar = loader.querySelector('.loader__progress-bar');
     const percentText = loader.querySelector('.loader__percent');
     
-    const MIN_LOADER_TIME = 2500;
+    const MIN_LOADER_TIME = 1800;
     const loaderStartTime = Date.now();
     let progress = 0;
     let targetProgress = 0;
@@ -68,7 +68,7 @@ function initLoader() {
     };
     
     // Simulation temporelle plus précise
-    const duration = 1200; // Temps pour atteindre 90%
+    const duration = 900; // Temps pour atteindre 90%
     const startSim = Date.now();
     
     const simulate = () => {
@@ -114,7 +114,7 @@ function initLoader() {
                     loader.style.display = 'none';
                     if (animationFrame) cancelAnimationFrame(animationFrame);
                 }, 800);
-            }, 500);
+            }, 300);
         }, remainingTime);
     };
     
