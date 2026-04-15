@@ -1115,7 +1115,6 @@ Web Developer & UX/UI Designer
     • Animation: Custom RAF & Observers
     %c
 
-    👋 Open to work
     📧 leobernard712@gmail.com
     
     `,
