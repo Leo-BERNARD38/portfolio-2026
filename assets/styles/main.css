@@ -232,6 +232,27 @@ em {
     font-family: var(--font-display);
 }
 
+/* Astérisque tournant - ponctuation de marque dans les titres */
+.spin-star {
+    display: inline-block;
+    width: 0.3em;
+    height: 0.3em;
+    margin-left: 0.18em;
+    vertical-align: 0.5em;
+    color: var(--color-accent);
+    animation: spinStar 14s linear infinite;
+}
+
+.spin-star svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes spinStar {
+    to { transform: rotate(360deg); }
+}
+
 /* ----------------------------------------
    Header & Navigation
    ---------------------------------------- */
@@ -666,12 +687,18 @@ em {
     font-size: var(--text-hero);
     line-height: 0.9;
     letter-spacing: -0.04em;
+    font-weight: 500;
+}
+
+.hero__title i {
+    font-weight: 600;
 }
 
 .hero__title em {
     display: inline-block;
     color: var(--color-accent);
     transform-origin: left bottom;
+    font-weight: 400;
 }
 
 .hero__title-line {
@@ -692,6 +719,38 @@ em {
 @media (min-width: 1024px) {
     .hero__aside {
         padding-bottom: var(--space-xl);
+        /* Colonne magazine : filet vertical de séparation */
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+        padding-left: var(--space-xl);
+    }
+}
+
+/* Libellé vertical en bord de page (desktop) */
+.hero__edge {
+    display: none;
+    position: absolute;
+    top: 50%;
+    right: calc(var(--container-padding) / 3);
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    color: var(--color-white-muted);
+    letter-spacing: 0.25em;
+    font-size: 9px;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.hero__edge::before,
+.hero__edge::after {
+    content: '';
+    width: 1px;
+    height: 42px;
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+@media (min-width: 1280px) {
+    .hero__edge {
+        display: inline-flex;
     }
 }
 
@@ -839,8 +898,12 @@ em {
 .stat__number {
     font-family: var(--font-display);
     font-size: var(--text-3xl);
-    font-weight: 500;
+    font-weight: 600;
     color: var(--color-white);
+}
+
+.stat__label {
+    font-weight: 700;
 }
 
 .stat__label {
@@ -1058,10 +1121,35 @@ em {
    ---------------------------------------- */
 .section-header {
     margin-bottom: var(--space-2xl);
-    padding: 0 var(--container-padding);
+    padding: var(--space-md) var(--container-padding) 0;
     max-width: 1800px;
     margin-left: auto;
     margin-right: auto;
+    position: relative;
+}
+
+/* Filet de tête de section, façon folio de magazine */
+.section-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: var(--container-padding);
+    right: var(--container-padding);
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Croix de repérage à l'extrémité du filet */
+.section-header::after {
+    content: '+';
+    position: absolute;
+    top: 0;
+    right: var(--container-padding);
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-accent);
+    line-height: 1;
 }
 
 .section-header--center {
@@ -1082,12 +1170,19 @@ em {
 
 .section-header__label .mono-text:first-child {
     color: var(--color-accent);
+    font-weight: 700;
 }
 
+/* Jeu de graisses : romain appuyé, italique léger */
 .section-header__title {
     font-size: clamp(3rem, 6.5vw, 6.5rem);
     max-width: 15ch;
     text-wrap: balance;
+    font-weight: 500;
+}
+
+.section-header__title em {
+    font-weight: 400;
 }
 
 .section-header--center .section-header__title {
@@ -1453,6 +1548,7 @@ em {
 .bento-item__title {
     font-family: var(--font-display);
     font-size: var(--text-2xl);
+    font-weight: 500;
     margin-bottom: var(--space-xs);
     letter-spacing: -0.02em;
 }
@@ -1464,8 +1560,13 @@ em {
     line-height: 1.6;
 }
 
+/* Folio de carte : millésime posé sur un filet */
 .bento-item__year {
+    display: block;
     color: var(--color-white-muted);
+    padding-top: var(--space-sm);
+    margin-top: var(--space-xs);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .bento-item__arrow {
@@ -1530,6 +1631,26 @@ em {
     overflow: hidden;
 }
 
+/* Croix de repérage aux coins de la page papier */
+.about::before,
+.about::after {
+    content: '+';
+    position: absolute;
+    top: 22px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: rgba(18, 19, 26, 0.3);
+    line-height: 1;
+}
+
+.about::before {
+    left: 24px;
+}
+
+.about::after {
+    right: 24px;
+}
+
 /* Adaptation des composants partagés sur fond papier */
 .about .section-header__label {
     color: var(--ink-muted);
@@ -1537,6 +1658,10 @@ em {
 
 .about .section-header__label .mono-text:first-child {
     color: var(--color-accent);
+}
+
+.about .section-header::before {
+    background-color: rgba(18, 19, 26, 0.15);
 }
 
 .about__grid {
@@ -1633,14 +1758,35 @@ em {
     max-width: 62ch;
 }
 
-/* Lead éditorial en serif */
+/* Lead éditorial en serif, ouvert par une lettrine */
 .about__text p:first-child {
     font-family: var(--font-display);
     font-size: var(--text-2xl);
+    font-weight: 500;
     color: var(--ink);
     line-height: 1.35;
     letter-spacing: -0.01em;
     margin-bottom: var(--space-lg);
+}
+
+.about__text p:first-child::first-letter {
+    float: left;
+    font-size: 2.6em;
+    line-height: 0.75;
+    padding: 0.06em 0.12em 0 0;
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+/* Signature : court filet accent après le lead */
+.about__text p:first-child::after {
+    content: '';
+    display: block;
+    clear: left;
+    width: 56px;
+    height: 2px;
+    background-color: var(--color-accent);
+    margin-top: var(--space-md);
 }
 
 .about__skills {
@@ -2014,10 +2160,26 @@ em {
 .service-card__title {
     font-family: var(--font-display);
     font-size: var(--text-2xl);
+    font-weight: 500;
     margin-bottom: var(--space-sm);
     position: relative;
     z-index: 1;
     transition: color 0.3s ease;
+}
+
+/* Filet accent sous le titre, s'étire au hover */
+.service-card__title::after {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 2px;
+    background-color: var(--color-accent);
+    margin-top: 14px;
+    transition: width 0.4s var(--ease-out-expo);
+}
+
+.service-card:hover .service-card__title::after {
+    width: 60px;
 }
 
 .service-card:hover .service-card__title {
@@ -2177,6 +2339,11 @@ em {
     font-size: clamp(var(--text-2xl), 4.5vw, var(--text-5xl));
     line-height: 1.2;
     letter-spacing: -0.02em;
+    font-weight: 500;
+}
+
+.testimonials__quote em {
+    font-weight: 400;
 }
 
 .testimonials__quote-line {
@@ -2403,11 +2570,13 @@ em {
     font-size: var(--text-5xl);
     line-height: 1;
     letter-spacing: -0.03em;
+    font-weight: 500;
 }
 
 .contact__title em {
     font-style: italic;
     color: var(--color-accent);
+    font-weight: 400;
 }
 
 .contact__title-line {
@@ -2644,6 +2813,27 @@ em {
     padding: var(--space-2xl) var(--container-padding) var(--space-lg);
     background-color: #f4f1ec;
     color: #12131a;
+    position: relative;
+}
+
+/* Croix de repérage, comme sur la page papier de l'à-propos */
+.footer::before,
+.footer::after {
+    content: '+';
+    position: absolute;
+    top: 22px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: rgba(18, 19, 26, 0.3);
+    line-height: 1;
+}
+
+.footer::before {
+    left: 24px;
+}
+
+.footer::after {
+    right: 24px;
 }
 
 .footer__grid {
@@ -3608,6 +3798,10 @@ em {
     }
 
     .noise-overlay {
+        animation: none;
+    }
+
+    .spin-star {
         animation: none;
     }
 
