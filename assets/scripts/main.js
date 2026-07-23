@@ -24,12 +24,102 @@ document.addEventListener('DOMContentLoaded', () => {
     initProjectModal();
     initParallax();
     initImageParallax(prefersReducedMotion);
+    initTitleReveal(prefersReducedMotion);
+    initScrollFX(prefersReducedMotion);
     initServiceCardsGlow(isTouchDevice);
     initButtonGlow(isTouchDevice);
     initBentoGlow(isTouchDevice);
     initLightbox();
     initServicesCarousel();
 });
+
+/* ----------------------------------------
+   Title Reveal - mot à mot
+   Découpe les titres de sections en mots
+   et les révèle en cascade (blur + translate)
+   ---------------------------------------- */
+function initTitleReveal(prefersReducedMotion) {
+    if (prefersReducedMotion) return;
+
+    const titles = document.querySelectorAll('.section-header__title, .contact__title');
+    if (!titles.length) return;
+
+    const splitWords = (el, counter) => {
+        Array.from(el.childNodes).forEach(child => {
+            if (child.nodeType === Node.TEXT_NODE) {
+                const parts = child.textContent.split(/(\s+)/);
+                const frag = document.createDocumentFragment();
+                parts.forEach(part => {
+                    if (!part) return;
+                    if (/^\s+$/.test(part)) {
+                        frag.appendChild(document.createTextNode(part));
+                    } else {
+                        const span = document.createElement('span');
+                        span.className = 'word';
+                        span.style.setProperty('--wi', counter.i++);
+                        span.textContent = part;
+                        frag.appendChild(span);
+                    }
+                });
+                el.replaceChild(frag, child);
+            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                splitWords(child, counter);
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('title-revealed');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.2 });
+
+    titles.forEach(title => {
+        const container = title.closest('.section-header') ||
+                          title.closest('.contact__main') ||
+                          title.parentElement;
+        splitWords(title, { i: 0 });
+        container.classList.add('title-anim');
+        observer.observe(container);
+    });
+}
+
+/* ----------------------------------------
+   Scroll FX - progression + marquee réactif
+   Une seule boucle rAF : barre de lecture
+   et skew du marquee selon la vélocité
+   ---------------------------------------- */
+function initScrollFX(prefersReducedMotion) {
+    const bar = document.querySelector('.scroll-progress');
+    const marquee = document.querySelector('.marquee');
+    if (!bar && !marquee) return;
+
+    let lastY = window.scrollY;
+    let skew = 0;
+
+    const loop = () => {
+        const y = window.scrollY;
+
+        if (bar) {
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            bar.style.transform = `scaleX(${max > 0 ? (y / max).toFixed(4) : 0})`;
+        }
+
+        if (marquee && !prefersReducedMotion) {
+            const velocity = y - lastY;
+            const target = Math.max(-6, Math.min(6, velocity * 0.35));
+            skew += (target - skew) * 0.1;
+            marquee.style.transform = `rotate(-1.2deg) skewX(${skew.toFixed(2)}deg)`;
+        }
+
+        lastY = y;
+        requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+}
 
 /* ----------------------------------------
    Fluid Scroll (inertie façon Lenis, sans lib)
@@ -306,15 +396,16 @@ function initLoader() {
             setTimeout(() => {
                 loader.classList.add('loaded');
                 document.body.classList.remove('loading');
-                
+
+                // Le rideau démarre à 250ms (après l'envol du contenu)
                 setTimeout(() => {
                     animateHeroEntrance();
-                }, 200);
-                
+                }, 400);
+
                 setTimeout(() => {
                     loader.style.display = 'none';
                     if (animationFrame) cancelAnimationFrame(animationFrame);
-                }, 800);
+                }, 1100);
             }, 300);
         }, remainingTime);
     };
@@ -558,7 +649,8 @@ function initRevealAnimations() {
     const revealImages = document.querySelectorAll('.reveal-img');
 
     // Also add reveal to key sections
-    const sections = document.querySelectorAll('.section-header, .bento-item, .service-card, .about__content-col, .testimonial');
+    // (les .section-header sont animés par initTitleReveal)
+    const sections = document.querySelectorAll('.bento-item, .service-card, .about__content-col, .testimonial');
     
     const observerOptions = {
         threshold: 0.1,
@@ -1177,24 +1269,33 @@ function initButtonGlow(isTouchDevice) {
     const PARALLAX_STRENGTH = 20; // pixels
     
     wrappers.forEach(wrapper => {
+        const btn = wrapper.querySelector('.btn');
+
         wrapper.addEventListener('mousemove', (e) => {
             const rect = wrapper.getBoundingClientRect();
             // Normalize to -1 to 1 range (center = 0)
             const normalizedX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
             const normalizedY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-            
+
             // Inverse parallax: mouse goes right, text goes left
             const translateX = -normalizedX * PARALLAX_STRENGTH;
             const translateY = -normalizedY * PARALLAX_STRENGTH;
-            
+
             wrapper.style.setProperty('--translate-x', `${translateX}px`);
             wrapper.style.setProperty('--translate-y', `${translateY}px`);
+
+            // Effet magnétique : le bouton suit légèrement le curseur
+            if (btn) {
+                btn.style.transform =
+                    `translate(${(normalizedX * 5).toFixed(1)}px, ${(normalizedY * 5).toFixed(1)}px) scale(1.02)`;
+            }
         });
-        
+
         wrapper.addEventListener('mouseleave', () => {
             // Smooth return to center
             wrapper.style.setProperty('--translate-x', '0px');
             wrapper.style.setProperty('--translate-y', '0px');
+            if (btn) btn.style.transform = '';
         });
     });
 }
