@@ -8,10 +8,13 @@
 initLoader();
 
 document.addEventListener('DOMContentLoaded', () => {
-    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches || 
-                          'ontouchstart' in window || 
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches ||
+                          'ontouchstart' in window ||
                           navigator.maxTouchPoints > 0;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    FluidScroll.init(isTouchDevice, prefersReducedMotion);
+    initAmbientCanvas(prefersReducedMotion);
     initCustomCursor(isTouchDevice);
     initSmoothScroll();
     initNavigation();
@@ -20,12 +23,229 @@ document.addEventListener('DOMContentLoaded', () => {
     PageTransition.init();
     initProjectModal();
     initParallax();
+    initImageParallax(prefersReducedMotion);
+    initWorkPreview(isTouchDevice);
     initServiceCardsGlow(isTouchDevice);
     initButtonGlow(isTouchDevice);
-    initBentoGlow(isTouchDevice);
     initLightbox();
     initServicesCarousel();
 });
+
+/* ----------------------------------------
+   Fluid Scroll (inertie façon Lenis, sans lib)
+   Desktop uniquement - le scroll natif reste
+   maître sur tactile et clavier.
+   ---------------------------------------- */
+const FluidScroll = {
+    active: false,
+    target: 0,
+    current: 0,
+    raf: null,
+    ease: 0.09,
+
+    init(isTouchDevice, prefersReducedMotion) {
+        if (isTouchDevice || prefersReducedMotion) return;
+        this.active = true;
+        this.target = this.current = window.scrollY;
+
+        window.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) return; // zoom navigateur
+            if (document.body.classList.contains('modal-open') ||
+                document.body.classList.contains('menu-open') ||
+                document.body.classList.contains('loading')) return;
+            if (e.target.closest('.project-modal, .lightbox, .fullscreen-menu')) return;
+
+            e.preventDefault();
+            const delta = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            this.target = Math.max(0, Math.min(this.target + delta, max));
+            this.start();
+        }, { passive: false });
+
+        // Resynchronise après un scroll natif (clavier, scrollbar, ancres)
+        window.addEventListener('scroll', () => {
+            if (!this.raf) {
+                this.target = this.current = window.scrollY;
+            }
+        }, { passive: true });
+    },
+
+    start() {
+        if (!this.raf) this.raf = requestAnimationFrame(() => this.loop());
+    },
+
+    loop() {
+        const diff = this.target - this.current;
+        this.current += diff * this.ease;
+        if (Math.abs(diff) < 0.5) this.current = this.target;
+        window.scrollTo(0, this.current);
+
+        if (this.current === this.target) {
+            this.raf = null;
+            return;
+        }
+        this.raf = requestAnimationFrame(() => this.loop());
+    },
+
+    to(y) {
+        if (!this.active) {
+            window.scrollTo({ top: y, behavior: 'smooth' });
+            return;
+        }
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        this.target = Math.max(0, Math.min(y, max));
+        this.start();
+    }
+};
+
+/* ----------------------------------------
+   Ambient Canvas
+   Halos oranges dessinés en très basse
+   résolution (l'upscale CSS fait office de
+   blur gratuit) - remplace filter: blur(100px)
+   ---------------------------------------- */
+function initAmbientCanvas(prefersReducedMotion) {
+    const canvas = document.querySelector('.ambient-canvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const scale = 0.06;
+    let w = 0;
+    let h = 0;
+
+    const resize = () => {
+        w = canvas.width = Math.max(24, Math.ceil(window.innerWidth * scale));
+        h = canvas.height = Math.max(24, Math.ceil(window.innerHeight * scale));
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const blobs = [
+        { x: 0.88, y: 0.10, r: 0.52, a: 0.11, dx: 0.9,  dy: 1.3, ph: 0.0 },
+        { x: 0.06, y: 0.78, r: 0.42, a: 0.07, dx: 1.2,  dy: 0.7, ph: 2.1 },
+        { x: 0.50, y: 0.45, r: 0.58, a: 0.03, dx: 0.6,  dy: 0.9, ph: 4.2 }
+    ];
+
+    const draw = (t) => {
+        ctx.clearRect(0, 0, w, h);
+        const base = Math.max(w, h);
+        for (const b of blobs) {
+            const bx = (b.x + Math.sin(t * b.dx + b.ph) * 0.07) * w;
+            const by = (b.y + Math.cos(t * b.dy + b.ph) * 0.09) * h;
+            const r = b.r * base;
+            const g = ctx.createRadialGradient(bx, by, 0, bx, by, r);
+            g.addColorStop(0, `rgba(255, 77, 0, ${b.a})`);
+            g.addColorStop(1, 'rgba(255, 77, 0, 0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, w, h);
+        }
+    };
+
+    if (prefersReducedMotion) {
+        draw(0);
+        return;
+    }
+
+    let t = 0;
+    let visible = !document.hidden;
+    document.addEventListener('visibilitychange', () => {
+        visible = !document.hidden;
+    });
+
+    (function frame() {
+        if (visible) {
+            t += 0.0035;
+            draw(t);
+        }
+        requestAnimationFrame(frame);
+    })();
+}
+
+/* ----------------------------------------
+   Image Parallax (lissé au lerp)
+   S'applique aux images [data-parallax-img]
+   dans un conteneur overflow:hidden
+   ---------------------------------------- */
+function initImageParallax(prefersReducedMotion) {
+    const imgs = document.querySelectorAll('[data-parallax-img]');
+    if (!imgs.length) return;
+
+    if (prefersReducedMotion) {
+        imgs.forEach(img => { img.style.transform = 'none'; });
+        return;
+    }
+
+    const items = Array.from(imgs).map(img => ({
+        img,
+        wrap: img.parentElement,
+        y: 0
+    }));
+
+    const update = () => {
+        const vh = window.innerHeight;
+        for (const it of items) {
+            const rect = it.wrap.getBoundingClientRect();
+            if (rect.bottom < -100 || rect.top > vh + 100) continue;
+
+            // Progression -1 (sous le viewport) -> 1 (au-dessus)
+            const progress = (rect.top + rect.height / 2 - vh / 2) / (vh / 2 + rect.height / 2);
+            const target = -progress * rect.height * 0.07;
+            it.y += (target - it.y) * 0.12;
+            it.img.style.transform = `translate3d(0, ${it.y.toFixed(2)}px, 0) scale(1.14)`;
+        }
+        requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
+}
+
+/* ----------------------------------------
+   Work Index - Preview flottante
+   L'image du projet suit le curseur sur les
+   lignes de l'index (desktop uniquement)
+   ---------------------------------------- */
+function initWorkPreview(isTouchDevice) {
+    const preview = document.querySelector('.work-preview');
+    const rows = document.querySelectorAll('.work-index__row');
+    if (!preview || !rows.length || isTouchDevice) return;
+
+    const img = preview.querySelector('img');
+    let mouseX = 0, mouseY = 0;
+    let x = 0, y = 0;
+    let raf = null;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    const loop = () => {
+        x += (mouseX - x) * 0.12;
+        y += (mouseY - y) * 0.12;
+        const tilt = (mouseX - x) * 0.03;
+        preview.style.transform =
+            `translate3d(${x + 28}px, ${y - preview.offsetHeight / 2}px, 0) rotate(${tilt.toFixed(2)}deg)`;
+        raf = requestAnimationFrame(loop);
+    };
+
+    rows.forEach(row => {
+        row.addEventListener('mouseenter', () => {
+            const src = row.dataset.preview;
+            if (src && img.getAttribute('src') !== src) img.src = src;
+            x = mouseX;
+            y = mouseY;
+            preview.classList.add('active');
+            if (!raf) raf = requestAnimationFrame(loop);
+        });
+
+        row.addEventListener('mouseleave', () => {
+            preview.classList.remove('active');
+            if (raf) {
+                cancelAnimationFrame(raf);
+                raf = null;
+            }
+        });
+    });
+}
 
 /* ----------------------------------------
    Loader / Preloader
@@ -195,7 +415,7 @@ function initCustomCursor(isTouchDevice) {
     animateCursor();
     
     // Interactive elements
-    const interactiveElements = document.querySelectorAll('a, button, .bento-item, [data-cursor="hover"]');
+    const interactiveElements = document.querySelectorAll('a, button, .project, [data-cursor="hover"]');
     
     interactiveElements.forEach(el => {
         el.addEventListener('mouseenter', () => {
@@ -241,23 +461,17 @@ function initSmoothScroll() {
             
             // Si c'est juste "#", retour en haut
             if (targetId === '#') {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+                FluidScroll.to(0);
                 return;
             }
-            
+
             const target = document.querySelector(targetId);
             if (target) {
                 const headerOffset = 0;
                 const elementPosition = target.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
+
+                FluidScroll.to(offsetPosition);
             }
         });
     });
@@ -360,9 +574,10 @@ function initFullscreenMenu() {
 function initRevealAnimations() {
     const revealElements = document.querySelectorAll('[data-reveal]');
     const staggerElements = document.querySelectorAll('[data-stagger]');
-    
+    const revealImages = document.querySelectorAll('.reveal-img');
+
     // Also add reveal to key sections
-    const sections = document.querySelectorAll('.section-header, .bento-item, .service-card, .about__image-col, .about__content-col, .testimonial');
+    const sections = document.querySelectorAll('.section-header, .project__body, .work-index__row, .service-card, .about__content-col, .testimonial');
     
     const observerOptions = {
         threshold: 0.1,
@@ -380,6 +595,23 @@ function initRevealAnimations() {
     
     revealElements.forEach(el => observer.observe(el));
     staggerElements.forEach(el => observer.observe(el));
+
+    // Les .reveal-img sont masqués par clip-path : leur rect visible est vide,
+    // l'observer ne se déclencherait jamais sur eux. On observe donc le parent.
+    const imgObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.querySelectorAll('.reveal-img').forEach(el => {
+                    el.classList.add('revealed');
+                });
+                imgObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    revealImages.forEach(el => {
+        imgObserver.observe(el.parentElement || el);
+    });
     
     // For sections without data-reveal
     sections.forEach((el, index) => {
@@ -498,7 +730,7 @@ function initProjectModal() {
     const closeBtn = modal.querySelector('.project-modal__close');
     const prevBtn = modal.querySelector('.project-modal__nav-btn--prev');
     const nextBtn = modal.querySelector('.project-modal__nav-btn--next');
-    const projectItems = document.querySelectorAll('.bento-item[data-project]');
+    const projectItems = document.querySelectorAll('.work [data-project]');
     
     // Project data
     const projectsData = {
@@ -827,6 +1059,15 @@ function initProjectModal() {
             const projectId = item.dataset.project;
             openModal(projectId);
         });
+
+        // Accessibilité clavier pour les <article role="button">
+        item.addEventListener('keydown', (e) => {
+            if (item.tagName === 'BUTTON') return;
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openModal(item.dataset.project);
+            }
+        });
     });
     
     closeBtn?.addEventListener('click', closeModal);
@@ -977,24 +1218,6 @@ function initButtonGlow(isTouchDevice) {
     });
 }
 
-// Bento Items Glow Effect
-function initBentoGlow(isTouchDevice) {
-    if (isTouchDevice) return;
-    
-    const bentoItems = document.querySelectorAll('.bento-item');
-    
-    bentoItems.forEach(item => {
-        item.addEventListener('mousemove', (e) => {
-            const rect = item.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            
-            item.style.setProperty('--mouse-x', `${x}%`);
-            item.style.setProperty('--mouse-y', `${y}%`);
-        });
-    });
-}
-
 /* ----------------------------------------
    Services Carousel Navigation
    ---------------------------------------- */
@@ -1085,21 +1308,6 @@ function initServicesCarousel() {
         }, 50);
     }, { passive: true });
 }
-
-/* ----------------------------------------
-   Bento Grid Hover Effect
-   ---------------------------------------- */
-document.querySelectorAll('.bento-item').forEach(item => {
-    item.addEventListener('mouseenter', function() {
-        this.style.zIndex = '10';
-    });
-    
-    item.addEventListener('mouseleave', function() {
-        setTimeout(() => {
-            this.style.zIndex = '1';
-        }, 300);
-    });
-});
 
 /* ----------------------------------------
    Console Easter Egg
