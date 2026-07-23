@@ -24,9 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initProjectModal();
     initParallax();
     initImageParallax(prefersReducedMotion);
-    initWorkPreview(isTouchDevice);
     initServiceCardsGlow(isTouchDevice);
     initButtonGlow(isTouchDevice);
+    initBentoGlow(isTouchDevice);
     initLightbox();
     initServicesCarousel();
 });
@@ -199,50 +199,31 @@ function initImageParallax(prefersReducedMotion) {
 }
 
 /* ----------------------------------------
-   Work Index - Preview flottante
-   L'image du projet suit le curseur sur les
-   lignes de l'index (desktop uniquement)
+   Bento Grid - Glow suit le curseur
    ---------------------------------------- */
-function initWorkPreview(isTouchDevice) {
-    const preview = document.querySelector('.work-preview');
-    const rows = document.querySelectorAll('.work-index__row');
-    if (!preview || !rows.length || isTouchDevice) return;
+function initBentoGlow(isTouchDevice) {
+    if (isTouchDevice) return;
 
-    const img = preview.querySelector('img');
-    let mouseX = 0, mouseY = 0;
-    let x = 0, y = 0;
-    let raf = null;
+    const bentoItems = document.querySelectorAll('.bento-item');
 
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
+    bentoItems.forEach(item => {
+        item.addEventListener('mousemove', (e) => {
+            const rect = item.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-    const loop = () => {
-        x += (mouseX - x) * 0.12;
-        y += (mouseY - y) * 0.12;
-        const tilt = (mouseX - x) * 0.03;
-        preview.style.transform =
-            `translate3d(${x + 28}px, ${y - preview.offsetHeight / 2}px, 0) rotate(${tilt.toFixed(2)}deg)`;
-        raf = requestAnimationFrame(loop);
-    };
-
-    rows.forEach(row => {
-        row.addEventListener('mouseenter', () => {
-            const src = row.dataset.preview;
-            if (src && img.getAttribute('src') !== src) img.src = src;
-            x = mouseX;
-            y = mouseY;
-            preview.classList.add('active');
-            if (!raf) raf = requestAnimationFrame(loop);
+            item.style.setProperty('--mouse-x', `${x}%`);
+            item.style.setProperty('--mouse-y', `${y}%`);
         });
 
-        row.addEventListener('mouseleave', () => {
-            preview.classList.remove('active');
-            if (raf) {
-                cancelAnimationFrame(raf);
-                raf = null;
-            }
+        item.addEventListener('mouseenter', function() {
+            this.style.zIndex = '10';
+        });
+
+        item.addEventListener('mouseleave', function() {
+            setTimeout(() => {
+                this.style.zIndex = '1';
+            }, 300);
         });
     });
 }
@@ -415,7 +396,7 @@ function initCustomCursor(isTouchDevice) {
     animateCursor();
     
     // Interactive elements
-    const interactiveElements = document.querySelectorAll('a, button, .project, [data-cursor="hover"]');
+    const interactiveElements = document.querySelectorAll('a, button, .bento-item, [data-cursor="hover"]');
     
     interactiveElements.forEach(el => {
         el.addEventListener('mouseenter', () => {
@@ -577,7 +558,7 @@ function initRevealAnimations() {
     const revealImages = document.querySelectorAll('.reveal-img');
 
     // Also add reveal to key sections
-    const sections = document.querySelectorAll('.section-header, .project__body, .work-index__row, .service-card, .about__content-col, .testimonial');
+    const sections = document.querySelectorAll('.section-header, .bento-item, .service-card, .about__content-col, .testimonial');
     
     const observerOptions = {
         threshold: 0.1,
