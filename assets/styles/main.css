@@ -1141,7 +1141,7 @@ em {
 .work__list {
     display: flex;
     flex-direction: column;
-    gap: clamp(7rem, 13vw, 14rem);
+    gap: clamp(5rem, 9vw, 9rem);
     max-width: 1800px;
     margin: 0 auto;
     padding: var(--space-xl) var(--container-padding) 0;
@@ -1184,19 +1184,64 @@ em {
     z-index: 1;
 }
 
-.project__media img {
+/* La cover abstraite n'est qu'un fond d'ambiance : assombrie
+   pour laisser le screenshot UI raconter le projet */
+.project__media > img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transform: scale(1.14);
-    filter: brightness(0.94);
+    filter: brightness(0.62) saturate(0.9);
     transition: filter 0.6s ease;
     will-change: transform;
 }
 
-.project:hover .project__media img,
-.project:focus-visible .project__media img {
-    filter: brightness(1.03);
+.project:hover .project__media > img,
+.project:focus-visible .project__media > img {
+    filter: brightness(0.78) saturate(1);
+}
+
+/* Screenshot UI réel dans un cadre navigateur */
+.project__shot {
+    position: absolute;
+    z-index: 2;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #17181d;
+    box-shadow:
+        0 40px 90px -20px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.09);
+    transition: transform 0.6s var(--ease-out-expo),
+                box-shadow 0.6s var(--ease-out-expo);
+}
+
+.project__shot img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.project__shot-bar {
+    display: flex;
+    gap: 5px;
+    padding: 9px 12px;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.project__shot-bar span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.project:hover .project__shot,
+.project:focus-visible .project__shot {
+    transform: translateY(-8px);
+    box-shadow:
+        0 50px 110px -20px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(255, 77, 0, 0.25);
 }
 
 .project__body {
@@ -1306,6 +1351,12 @@ em {
     right: 2%;
 }
 
+.project--optiwits .project__shot {
+    width: 62%;
+    right: 5%;
+    bottom: 7%;
+}
+
 /* 02 — Camping-Car Partner : portrait à gauche, texte ancré en bas à droite */
 .project--ccp .project__media {
     grid-column: 1 / 7;
@@ -1326,6 +1377,12 @@ em {
     right: 0;
 }
 
+.project--ccp .project__shot {
+    width: 85%;
+    left: 7.5%;
+    bottom: 6%;
+}
+
 /* 03 — ModNation : cinémascope pleine largeur, texte en deux colonnes */
 .project--modnation .project__media {
     grid-column: 1 / -1;
@@ -1336,6 +1393,12 @@ em {
 .project--modnation .project__index {
     top: -0.35em;
     left: -0.03em;
+}
+
+.project--modnation .project__shot {
+    width: 46%;
+    right: 5%;
+    bottom: 10%;
 }
 
 .project--modnation .project__body {
@@ -1407,12 +1470,30 @@ em {
     .project__title {
         font-size: clamp(2.25rem, 9vw, 3.5rem);
     }
+
+    .project--optiwits .project__shot,
+    .project--ccp .project__shot,
+    .project--modnation .project__shot {
+        width: 78%;
+        left: auto;
+        right: 4%;
+        bottom: 5%;
+    }
+
+    .project__shot-bar {
+        padding: 6px 9px;
+    }
+
+    .project__shot-bar span {
+        width: 5px;
+        height: 5px;
+    }
 }
 
 /* Index éditorial */
 .work-index {
     max-width: 1800px;
-    margin: clamp(6rem, 11vw, 11rem) auto 0;
+    margin: clamp(5rem, 8vw, 8rem) auto 0;
     padding: 0 var(--container-padding);
 }
 
