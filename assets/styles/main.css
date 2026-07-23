@@ -803,7 +803,12 @@ em {
         justify-content: flex-start;
         gap: var(--space-xl);
     }
-    
+
+    /* Le padding-top du hero suffit sur mobile */
+    .hero__spacer {
+        display: none;
+    }
+
     .hero__scroll {
         display: none;
     }

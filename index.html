@@ -150,6 +150,21 @@
             color: var(--color-bg);
             font-variant-numeric: tabular-nums;
         }
+        /* Mobile : compteur au-dessus, nom + barre pleine largeur dessous */
+        @media (max-width: 640px) {
+            .loader__footer {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1.25rem;
+            }
+            .loader__percent {
+                font-size: clamp(4.5rem, 22vw, 7rem);
+                align-self: flex-end;
+            }
+            .loader__left {
+                width: 100%;
+            }
+        }
         /* Sortie en deux temps : le contenu s'envole, puis le rideau */
         .loader.loaded {
             animation: loaderExit 0.8s var(--ease-out-expo) 0.25s forwards;
