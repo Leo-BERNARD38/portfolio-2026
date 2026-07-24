@@ -3256,6 +3256,17 @@ em {
     margin-bottom: var(--space-2xl);
 }
 
+/* Un conteneur par projet, construit une fois puis affiché/masqué */
+.pm-body__page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+}
+
+.pm-body__page[hidden] {
+    display: none;
+}
+
 /* Chapô */
 .pm-intro::before {
     content: '';
@@ -3719,7 +3730,8 @@ em {
         height: 44px;
     }
 
-    .pm-body {
+    .pm-body,
+    .pm-body__page {
         gap: var(--space-xl);
     }
 

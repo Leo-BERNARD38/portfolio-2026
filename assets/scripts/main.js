@@ -17,12 +17,12 @@ function flushPendingInits() {
 }
 function scheduleInits(fns) {
     pendingInits.push(...fns);
-    // timeout obligatoire : pendant un chargement le navigateur n'est
-    // jamais "idle", sans lui la file entière s'exécuterait d'un bloc
-    // au flush final
+    // Laisse le navigateur choisir les vrais moments creux ; le timeout
+    // n'est qu'un filet de sécurité (pendant un chargement il n'y a
+    // parfois aucun idle), le loader rallongé absorbe le reste
     const idle = (cb) => ('requestIdleCallback' in window)
-        ? requestIdleCallback(cb, { timeout: 50 })
-        : setTimeout(cb, 16);
+        ? requestIdleCallback(cb, { timeout: 200 })
+        : setTimeout(cb, 32);
     const runNext = () => {
         if (!pendingInits.length) return;
         pendingInits.shift()();
@@ -417,7 +417,10 @@ function initLoader() {
     const progressBar = loader.querySelector('.loader__progress-bar');
     const percentText = loader.querySelector('.loader__percent');
     
-    const MIN_LOADER_TIME = 1000;
+    // Volontairement généreux : le loader absorbe tout le travail lourd
+    // (inits, pré-construction des projets) pour que la page soit ensuite
+    // 100% fluide — un loader un peu plus long est assumé
+    const MIN_LOADER_TIME = 1600;
     const loaderStartTime = Date.now();
     let progress = 0;
     let targetProgress = 0;
@@ -1066,8 +1069,30 @@ function initProjectModal() {
         return fig;
     }
 
-    function renderBlocks(project) {
-        bodyEl.innerHTML = '';
+    // Corps de projets : construits UNE seule fois chacun (pendant le
+    // loader, en idle), puis simplement affichés/masqués — l'ouverture
+    // d'un projet ne manipule plus le DOM
+    const builtBodies = new Map();
+
+    function ensureBuilt(projectId) {
+        let page = builtBodies.get(projectId);
+        if (!page) {
+            page = document.createElement('div');
+            page.className = 'pm-body__page';
+            page.hidden = true;
+            renderBlocks(projectsData[projectId], page);
+            bodyEl.appendChild(page);
+            builtBodies.set(projectId, page);
+        }
+        return page;
+    }
+
+    function showBody(projectId) {
+        const page = ensureBuilt(projectId);
+        builtBodies.forEach(el => { el.hidden = el !== page; });
+    }
+
+    function renderBlocks(project, root) {
         let chapterCount = 0;
         let figCount = 0;
 
@@ -1124,13 +1149,14 @@ function initProjectModal() {
             }
 
             if (el) {
-                bodyEl.appendChild(el);
+                root.appendChild(el);
                 watchReveal(el);
             }
         });
     }
 
-    function updateModalContent(project, deferHeroIn = false) {
+    function updateModalContent(projectId, deferHeroIn = false) {
+        const project = projectsData[projectId];
         heroEl.classList.remove('is-in');
 
         modal.querySelector('.project-modal__number').textContent = project.number;
@@ -1179,7 +1205,7 @@ function initProjectModal() {
             }
         }
 
-        renderBlocks(project);
+        showBody(projectId);
 
         // Navigation bas de page (boucle sur les 6 projets)
         const n = projectKeys.length;
@@ -1215,10 +1241,10 @@ function initProjectModal() {
         const project = projectsData[projectId];
         if (!project) return;
 
-        // Le DOM du modal (~50ms sur mobile) est construit et mis en page
-        // AVANT le départ du rideau : l'animation part sur un thread libre
+        // Corps pré-construit pendant le loader : ici on ne fait
+        // qu'afficher/masquer, puis payer le layout avant l'animation
         currentProjectIndex = projectKeys.indexOf(projectId);
-        updateModalContent(project, true);
+        updateModalContent(projectId, true);
         void container.offsetHeight;
 
         PageTransition.animate(() => {
@@ -1237,7 +1263,7 @@ function initProjectModal() {
 
     function goToProject(index) {
         currentProjectIndex = (index + projectKeys.length) % projectKeys.length;
-        updateModalContent(projectsData[projectKeys[currentProjectIndex]]);
+        updateModalContent(projectKeys[currentProjectIndex]);
     }
 
     // Event listeners
@@ -1269,6 +1295,10 @@ function initProjectModal() {
         if (e.key === 'ArrowLeft') goToProject(currentProjectIndex - 1);
         if (e.key === 'ArrowRight') goToProject(currentProjectIndex + 1);
     });
+
+    // Pré-construit les 6 corps de projets pendant le loader (idle) :
+    // toute ouverture ultérieure est un simple afficher/masquer
+    scheduleInits(projectKeys.map(key => () => ensureBuilt(key)));
 }
 
 /* ----------------------------------------
