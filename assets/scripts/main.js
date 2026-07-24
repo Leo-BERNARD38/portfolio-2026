@@ -7,29 +7,58 @@
 // Initialize immediately
 initLoader();
 
+// File d'inits différées : exécutées une par une pendant les temps morts
+// du chargement (le loader bloque l'interaction), pour ne jamais bloquer
+// le thread principal d'un seul gros lot. flushPendingInits() garantit
+// que tout est prêt avant la levée du loader.
+const pendingInits = [];
+function flushPendingInits() {
+    while (pendingInits.length) pendingInits.shift()();
+}
+function scheduleInits(fns) {
+    pendingInits.push(...fns);
+    // Laisse le navigateur choisir les vrais moments creux ; le timeout
+    // n'est qu'un filet de sécurité (pendant un chargement il n'y a
+    // parfois aucun idle), le loader rallongé absorbe le reste
+    const idle = (cb) => ('requestIdleCallback' in window)
+        ? requestIdleCallback(cb, { timeout: 200 })
+        : setTimeout(cb, 32);
+    const runNext = () => {
+        if (!pendingInits.length) return;
+        pendingInits.shift()();
+        idle(runNext);
+    };
+    idle(runNext);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const isTouchDevice = window.matchMedia('(pointer: coarse)').matches ||
                           'ontouchstart' in window ||
                           navigator.maxTouchPoints > 0;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    initAmbientCanvas(prefersReducedMotion);
-    initCustomCursor(isTouchDevice);
+    // Immédiat : le strict nécessaire, tout est léger
+    PageTransition.init();
     initSmoothScroll();
     initNavigation();
     initFullscreenMenu();
-    initRevealAnimations();
-    PageTransition.init();
-    initProjectModal();
-    initImageParallax(prefersReducedMotion);
-    initTitleReveal(prefersReducedMotion);
-    initScrollFX(prefersReducedMotion);
-    initServiceCardsGlow(isTouchDevice);
-    initButtonGlow(isTouchDevice);
-    initBentoGlow(isTouchDevice);
-    initLightbox();
-    initServicesCarousel();
-    initAnimationPause();
+    initCustomCursor(isTouchDevice);
+    initAmbientCanvas(prefersReducedMotion);
+    initScrollFX(isTouchDevice, prefersReducedMotion);
+
+    // Différé : DOM churn et observers, étalés pendant le loader
+    scheduleInits([
+        () => initTitleReveal(prefersReducedMotion),
+        () => initRevealAnimations(),
+        () => initProjectModal(),
+        () => initImageParallax(isTouchDevice, prefersReducedMotion),
+        () => initServiceCardsGlow(isTouchDevice),
+        () => initButtonGlow(isTouchDevice),
+        () => initBentoGlow(isTouchDevice),
+        () => initLightbox(),
+        () => initServicesCarousel(),
+        () => initAnimationPause()
+    ]);
 });
 
 /* ----------------------------------------
@@ -39,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
    ---------------------------------------- */
 function initAnimationPause() {
     const els = document.querySelectorAll(
-        '.marquee, .spin-star, .hero__scroll-line, .about__badge-dot, .contact__status-dot'
+        '.marquee, .hero__scroll-line, .about__badge-dot, .contact__status-dot'
     );
     if (!els.length) return;
 
@@ -110,10 +139,13 @@ function initTitleReveal(prefersReducedMotion) {
    Une seule boucle rAF : barre de lecture
    et skew du marquee selon la vélocité
    ---------------------------------------- */
-function initScrollFX(prefersReducedMotion) {
+function initScrollFX(isTouchDevice, prefersReducedMotion) {
     const bar = document.querySelector('.scroll-progress');
-    const marquee = document.querySelector('.marquee');
-    const heroBgText = document.querySelector('.hero__bg-text');
+    // Skew du marquee et parallax du hero : cosmétiques, désactivés sur
+    // tactile pour ne rien écrire pendant le scroll (écrans 120 Hz)
+    const skipFX = isTouchDevice || prefersReducedMotion;
+    const marquee = skipFX ? null : document.querySelector('.marquee');
+    const heroBgText = skipFX ? null : document.querySelector('.hero__bg-text');
     if (!bar && !marquee && !heroBgText) return;
 
     let max = 1;
@@ -141,7 +173,7 @@ function initScrollFX(prefersReducedMotion) {
                 }
             }
 
-            if (marquee && !prefersReducedMotion) {
+            if (marquee) {
                 const target = Math.max(-6, Math.min(6, (y - lastY) * 0.35));
                 skew += (target - skew) * 0.1;
                 if (Math.abs(skew) < 0.02 && target === 0) skew = 0;
@@ -149,7 +181,7 @@ function initScrollFX(prefersReducedMotion) {
                 marquee.style.transform = `rotate(-1.2deg) skewX(${skew.toFixed(2)}deg)`;
             }
 
-            if (heroBgText && !prefersReducedMotion && y < window.innerHeight) {
+            if (heroBgText && y < window.innerHeight) {
                 heroBgText.style.transform = `translate(-50%, calc(-50% + ${(y * 0.3).toFixed(1)}px))`;
             }
 
@@ -260,10 +292,17 @@ function initAmbientCanvas(prefersReducedMotion) {
 
     let t = 0;
     let raf = null;
+    let tick = 0;
 
     const frame = () => {
-        t += 0.0035;
-        draw(t);
+        // Inutile de dessiner sous un calque opaque (loader, rideau) ;
+        // les halos dérivent lentement : un dessin sur deux suffit
+        const covered = document.body.classList.contains('loading') ||
+                        document.body.classList.contains('is-transitioning');
+        if (!covered && (tick++ & 1) === 0) {
+            t += 0.007;
+            draw(t);
+        }
         raf = requestAnimationFrame(frame);
     };
 
@@ -284,11 +323,13 @@ function initAmbientCanvas(prefersReducedMotion) {
    S'applique aux images [data-parallax-img]
    dans un conteneur overflow:hidden
    ---------------------------------------- */
-function initImageParallax(prefersReducedMotion) {
+function initImageParallax(isTouchDevice, prefersReducedMotion) {
     const imgs = document.querySelectorAll('[data-parallax-img]');
     if (!imgs.length) return;
 
-    if (prefersReducedMotion) {
+    // Tactile : pas de parallax (lectures de rect + raster agrandi x1.14
+    // pendant le scroll pour un effet à peine perceptible au doigt)
+    if (isTouchDevice || prefersReducedMotion) {
         imgs.forEach(img => { img.style.transform = 'none'; });
         return;
     }
@@ -378,10 +419,14 @@ function initLoader() {
     const progressBar = loader.querySelector('.loader__progress-bar');
     const percentText = loader.querySelector('.loader__percent');
     
-    const MIN_LOADER_TIME = 1000;
+    // Volontairement généreux : le loader absorbe tout le travail lourd
+    // (inits, pré-construction des projets) pour que la page soit ensuite
+    // 100% fluide — un loader un peu plus long est assumé
+    const MIN_LOADER_TIME = 1600;
     const loaderStartTime = Date.now();
     let progress = 0;
     let targetProgress = 0;
+    let lastDisplayProgress = -1;
     let animationFrame = null;
     
     // Déclencher l'animation du SVG
@@ -397,7 +442,12 @@ function initLoader() {
         
         const displayProgress = Math.min(Math.round(progress), 100);
         if (progressBar) progressBar.style.transform = `scaleX(${(progress / 100).toFixed(4)})`;
-        if (percentText) percentText.textContent = `${displayProgress}%`;
+        // Le compteur est un texte géant : on ne le réécrit (layout + raster)
+        // que quand le pourcentage entier change
+        if (percentText && displayProgress !== lastDisplayProgress) {
+            percentText.textContent = `${displayProgress}%`;
+            lastDisplayProgress = displayProgress;
+        }
         
         if (Math.abs(diff) > 0.05) {
             animationFrame = requestAnimationFrame(updateProgressSmooth);
@@ -432,9 +482,12 @@ function initLoader() {
     const hideLoader = () => {
         const elapsedTime = Date.now() - loaderStartTime;
         const remainingTime = Math.max(0, MIN_LOADER_TIME - elapsedTime);
-        
+
         // Attendre le délai minimal ET la fin du chargement réel
         setTimeout(() => {
+            // Dernier moment utile : la file d'inits a eu tout le temps du
+            // loader pour se drainer, on ne solde que l'éventuel reliquat
+            flushPendingInits();
             targetProgress = 100;
             if (!animationFrame) {
                 animationFrame = requestAnimationFrame(updateProgressSmooth);
@@ -543,20 +596,15 @@ function initCustomCursor(isTouchDevice) {
         }
     });
     
-    // Interactive elements
-    const interactiveElements = document.querySelectorAll('a, button, .bento-item, [data-cursor="hover"]');
-    
-    interactiveElements.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            cursor.classList.add('active');
-            follower.classList.add('active');
-        });
-        
-        el.addEventListener('mouseleave', () => {
-            cursor.classList.remove('active');
-            follower.classList.remove('active');
-        });
-    });
+    // Délégation : 2 listeners globaux couvrent tous les éléments
+    // interactifs, présents comme futurs (modal, lightbox...) — plus
+    // aucun câblage manuel élément par élément
+    const HOVER_SELECTOR = 'a, button, .bento-item, [data-cursor="hover"], .pm-figure__frame';
+    document.addEventListener('pointerover', (e) => {
+        const on = !!e.target.closest(HOVER_SELECTOR);
+        cursor.classList.toggle('active', on);
+        follower.classList.toggle('active', on);
+    }, { passive: true });
     
     // Hide cursor when leaving window
     document.addEventListener('mouseleave', () => {
@@ -771,6 +819,8 @@ const PageTransition = {
         this.element.classList.toggle('is-reverse', reverse);
         this.element.classList.remove('is-animating-out');
         this.element.classList.add('is-animating-in');
+        // Coupe le rendu des calques cachés sous le rideau (grain, canvas)
+        document.body.classList.add('is-transitioning');
 
         setTimeout(() => {
             // Contenu échangé pendant que l'écran est couvert
@@ -781,6 +831,7 @@ const PageTransition = {
 
             setTimeout(() => {
                 this.element.classList.remove('is-animating-out', 'is-reverse');
+                document.body.classList.remove('is-transitioning');
                 this.isAnimating = false;
             }, this.OUT_MS);
         }, this.COVER_MS);
@@ -957,17 +1008,6 @@ function initProjectModal() {
     let currentProjectIndex = 0;
     let freshUntil = 0;
 
-    function bindCursorHover(el) {
-        el.addEventListener('mouseenter', () => {
-            document.querySelector('.cursor')?.classList.add('active');
-            document.querySelector('.cursor-follower')?.classList.add('active');
-        });
-        el.addEventListener('mouseleave', () => {
-            document.querySelector('.cursor')?.classList.remove('active');
-            document.querySelector('.cursor-follower')?.classList.remove('active');
-        });
-    }
-
     // Révélation des blocs au scroll — root = conteneur scrollable de la modale.
     // Juste après un changement de contenu (freshUntil), les blocs visibles
     // reçoivent un délai en cascade pour une entrée orchestrée.
@@ -1010,13 +1050,34 @@ function initProjectModal() {
         frame.appendChild(img);
         frame.appendChild(overlay);
         frame.addEventListener('click', () => openLightbox(src, alt));
-        bindCursorHover(frame);
         fig.appendChild(frame);
         return fig;
     }
 
-    function renderBlocks(project) {
-        bodyEl.innerHTML = '';
+    // Corps de projets : construits UNE seule fois chacun (pendant le
+    // loader, en idle), puis simplement affichés/masqués — l'ouverture
+    // d'un projet ne manipule plus le DOM
+    const builtBodies = new Map();
+
+    function ensureBuilt(projectId) {
+        let page = builtBodies.get(projectId);
+        if (!page) {
+            page = document.createElement('div');
+            page.className = 'pm-body__page';
+            page.hidden = true;
+            renderBlocks(projectsData[projectId], page);
+            bodyEl.appendChild(page);
+            builtBodies.set(projectId, page);
+        }
+        return page;
+    }
+
+    function showBody(projectId) {
+        const page = ensureBuilt(projectId);
+        builtBodies.forEach(el => { el.hidden = el !== page; });
+    }
+
+    function renderBlocks(project, root) {
         let chapterCount = 0;
         let figCount = 0;
 
@@ -1073,35 +1134,58 @@ function initProjectModal() {
             }
 
             if (el) {
-                bodyEl.appendChild(el);
+                root.appendChild(el);
                 watchReveal(el);
             }
         });
     }
 
-    function updateModalContent(project) {
+    // Références du shell résolues une seule fois
+    const refs = {
+        number: modal.querySelector('.project-modal__number'),
+        indexCurrent: modal.querySelector('.pm-hero__index-current'),
+        indexTotal: modal.querySelector('.pm-hero__index-total'),
+        title: modal.querySelector('.project-modal__title'),
+        subtitle: modal.querySelector('.project-modal__subtitle'),
+        year: modal.querySelector('.project-modal__year'),
+        role: modal.querySelector('.project-modal__role'),
+        context: modal.querySelector('.project-modal__context'),
+        tags: modal.querySelector('.project-modal__tags'),
+        stackList: modal.querySelector('.project-modal__stack-list'),
+        links: modal.querySelector('.project-modal__links'),
+        linksWrapper: modal.querySelector('.project-modal__links-container'),
+        colophon: modal.querySelector('.pm-colophon'),
+        stack: modal.querySelector('.project-modal__stack'),
+        footer: modal.querySelector('.pm-footer'),
+        prevTitle: modal.querySelector('.pm-footer__prev-title'),
+        nextNum: modal.querySelector('.pm-footer__next-num'),
+        nextName: modal.querySelector('.pm-footer__next-name')
+    };
+
+    function updateModalContent(projectId, deferHeroIn = false) {
+        const project = projectsData[projectId];
         heroEl.classList.remove('is-in');
 
-        modal.querySelector('.project-modal__number').textContent = project.number;
-        modal.querySelector('.pm-hero__index-current').textContent = project.number;
-        modal.querySelector('.pm-hero__index-total').textContent = `/${pad(projectKeys.length)}`;
-        modal.querySelector('.project-modal__title').textContent = project.title;
-        modal.querySelector('.project-modal__subtitle').textContent = project.subtitle;
-        modal.querySelector('.project-modal__year').textContent = project.year;
-        modal.querySelector('.project-modal__role').textContent = project.role;
-        modal.querySelector('.project-modal__context').textContent = project.context;
+        refs.number.textContent = project.number;
+        refs.indexCurrent.textContent = project.number;
+        refs.indexTotal.textContent = `/${pad(projectKeys.length)}`;
+        refs.title.textContent = project.title;
+        refs.subtitle.textContent = project.subtitle;
+        refs.year.textContent = project.year;
+        refs.role.textContent = project.role;
+        refs.context.textContent = project.context;
 
-        modal.querySelector('.project-modal__tags').innerHTML = project.tags.map(tag =>
+        refs.tags.innerHTML = project.tags.map(tag =>
             `<span class="tag mono-text">${tag}</span>`
         ).join('');
 
-        modal.querySelector('.project-modal__stack-list').innerHTML = project.stack.map(tech =>
+        refs.stackList.innerHTML = project.stack.map(tech =>
             `<span class="tag mono-text">${tech}</span>`
         ).join('');
 
         // Liens dans le colophon
-        const linksContainer = modal.querySelector('.project-modal__links');
-        const linksWrapper = modal.querySelector('.project-modal__links-container');
+        const linksContainer = refs.links;
+        const linksWrapper = refs.linksWrapper;
         if (linksContainer && linksWrapper) {
             linksContainer.innerHTML = '';
             if (project.links && project.links.length > 0) {
@@ -1120,7 +1204,6 @@ function initProjectModal() {
                         </svg>
                         <span>${link.label}</span>
                     `;
-                    bindCursorHover(btn);
                     linksContainer.appendChild(btn);
                 });
             } else {
@@ -1128,24 +1211,31 @@ function initProjectModal() {
             }
         }
 
-        renderBlocks(project);
+        showBody(projectId);
 
         // Navigation bas de page (boucle sur les 6 projets)
         const n = projectKeys.length;
         const prevProject = projectsData[projectKeys[(currentProjectIndex - 1 + n) % n]];
         const nextProject = projectsData[projectKeys[(currentProjectIndex + 1) % n]];
-        modal.querySelector('.pm-footer__prev-title').textContent = prevProject.title;
-        modal.querySelector('.pm-footer__next-num').textContent = `№ ${nextProject.number}`;
-        modal.querySelector('.pm-footer__next-name').textContent = nextProject.title;
+        refs.prevTitle.textContent = prevProject.title;
+        refs.nextNum.textContent = `№ ${nextProject.number}`;
+        refs.nextName.textContent = nextProject.title;
 
         // Révélation des éléments fixes
-        watchReveal(modal.querySelector('.pm-colophon'));
-        watchReveal(modal.querySelector('.project-modal__stack'));
-        watchReveal(modal.querySelector('.pm-footer'));
+        watchReveal(refs.colophon);
+        watchReveal(refs.stack);
+        watchReveal(refs.footer);
 
         container.scrollTop = 0;
-        freshUntil = performance.now() + 1400;
+        // Fenêtre élargie quand le contenu est pré-construit avant le rideau
+        freshUntil = performance.now() + (deferHeroIn ? 2200 : 1400);
 
+        if (!deferHeroIn) playHeroIn();
+    }
+
+    // L'entrée du hero est déclenchée séparément quand le modal est
+    // pré-construit caché (visibility: hidden laisse tourner les transitions)
+    function playHeroIn() {
         if (prefersReducedMotion) {
             heroEl.classList.add('is-in');
         } else {
@@ -1157,12 +1247,16 @@ function initProjectModal() {
         const project = projectsData[projectId];
         if (!project) return;
 
-        PageTransition.animate(() => {
-            currentProjectIndex = projectKeys.indexOf(projectId);
-            updateModalContent(project);
+        // Corps pré-construit pendant le loader : ici on ne fait
+        // qu'afficher/masquer, puis payer le layout avant l'animation
+        currentProjectIndex = projectKeys.indexOf(projectId);
+        updateModalContent(projectId, true);
+        void container.offsetHeight;
 
+        PageTransition.animate(() => {
             modal.classList.add('active');
             document.body.classList.add('modal-open');
+            playHeroIn();
         }, false, { kicker: `Étude de cas — № ${project.number}`, word: project.title });
     }
 
@@ -1175,7 +1269,7 @@ function initProjectModal() {
 
     function goToProject(index) {
         currentProjectIndex = (index + projectKeys.length) % projectKeys.length;
-        updateModalContent(projectsData[projectKeys[currentProjectIndex]]);
+        updateModalContent(projectKeys[currentProjectIndex]);
     }
 
     // Event listeners
@@ -1207,6 +1301,54 @@ function initProjectModal() {
         if (e.key === 'ArrowLeft') goToProject(currentProjectIndex - 1);
         if (e.key === 'ArrowRight') goToProject(currentProjectIndex + 1);
     });
+
+    // Pré-construit les 6 corps de projets pendant le loader (idle) :
+    // toute ouverture ultérieure est un simple afficher/masquer
+    scheduleInits(projectKeys.map(key => () => ensureBuilt(key)));
+
+    // Préchargement de toutes les images projets (~450 Ko en mobile) :
+    // après le chargement complet, en idle, une image à la fois. Le
+    // survol d'une carte fait passer son projet en tête de file. Le
+    // décodage, lui, n'a lieu qu'à l'affichage (mémoire GPU).
+    function initProjectPrefetch() {
+        if (navigator.connection && navigator.connection.saveData) return;
+
+        let queue = [];
+        projectKeys.forEach(key => {
+            (projectsData[key].blocks || []).forEach(block => {
+                const srcs = block.type === 'image' ? [block.src]
+                           : block.type === 'duo' ? block.images : [];
+                srcs.forEach(src => queue.push({ key, src }));
+            });
+        });
+
+        const holder = []; // garde les Image vivantes jusqu'au onload
+        const idle = (cb) => ('requestIdleCallback' in window)
+            ? requestIdleCallback(cb, { timeout: 2000 })
+            : setTimeout(cb, 250);
+
+        const next = () => {
+            const item = queue.shift();
+            if (!item) return;
+            const img = new Image();
+            img.onload = img.onerror = () => idle(next);
+            img.sizes = '(max-width: 1240px) 100vw, 1160px';
+            img.srcset = `${item.src.replace('.webp', '-960.webp')} 960w, ${item.src} 1920w`;
+            holder.push(img);
+        };
+
+        if (document.readyState === 'complete') idle(next);
+        else window.addEventListener('load', () => idle(next), { once: true });
+
+        projectItems.forEach(item => {
+            item.addEventListener('pointerenter', () => {
+                const key = item.dataset.project;
+                queue = queue.filter(q => q.key === key)
+                    .concat(queue.filter(q => q.key !== key));
+            }, { passive: true });
+        });
+    }
+    initProjectPrefetch();
 }
 
 /* ----------------------------------------
@@ -1250,25 +1392,6 @@ function initLightbox() {
 
     closeBtn.addEventListener('click', closeLightbox);
 
-    // Custom Cursor for Close Button
-    closeBtn.addEventListener('mouseenter', () => {
-        const cursor = document.querySelector('.cursor');
-        const follower = document.querySelector('.cursor-follower');
-        if (cursor && follower) {
-            cursor.classList.add('active');
-            follower.classList.add('active');
-        }
-    });
-    
-    closeBtn.addEventListener('mouseleave', () => {
-        const cursor = document.querySelector('.cursor');
-        const follower = document.querySelector('.cursor-follower');
-        if (cursor && follower) {
-            cursor.classList.remove('active');
-            follower.classList.remove('active');
-        }
-    });
-
     lightbox.addEventListener('click', (e) => {
         if (e.target === lightbox) closeLightbox();
     });
@@ -1281,13 +1404,18 @@ function initLightbox() {
 
 function openLightbox(src, alt) {
     const lightbox = document.getElementById('lightbox');
+    if (!lightbox) return;
     const img = lightbox.querySelector('.lightbox__img');
-    
-    if (!lightbox || !img) return;
+    if (!img) return;
 
     img.src = src;
     img.alt = alt || '';
-    lightbox.classList.add('active');
+
+    // L'image plein format est décodée AVANT le fondu : pas d'accroc
+    // ni d'apparition en deux temps pendant l'animation
+    const show = () => lightbox.classList.add('active');
+    if (img.decode) img.decode().then(show, show);
+    else show();
 }
 
 /* ----------------------------------------
