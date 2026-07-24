@@ -7,29 +7,58 @@
 // Initialize immediately
 initLoader();
 
+// File d'inits différées : exécutées une par une pendant les temps morts
+// du chargement (le loader bloque l'interaction), pour ne jamais bloquer
+// le thread principal d'un seul gros lot. flushPendingInits() garantit
+// que tout est prêt avant la levée du loader.
+const pendingInits = [];
+function flushPendingInits() {
+    while (pendingInits.length) pendingInits.shift()();
+}
+function scheduleInits(fns) {
+    pendingInits.push(...fns);
+    // timeout obligatoire : pendant un chargement le navigateur n'est
+    // jamais "idle", sans lui la file entière s'exécuterait d'un bloc
+    // au flush final
+    const idle = (cb) => ('requestIdleCallback' in window)
+        ? requestIdleCallback(cb, { timeout: 50 })
+        : setTimeout(cb, 16);
+    const runNext = () => {
+        if (!pendingInits.length) return;
+        pendingInits.shift()();
+        idle(runNext);
+    };
+    idle(runNext);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const isTouchDevice = window.matchMedia('(pointer: coarse)').matches ||
                           'ontouchstart' in window ||
                           navigator.maxTouchPoints > 0;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    initAmbientCanvas(prefersReducedMotion);
-    initCustomCursor(isTouchDevice);
+    // Immédiat : le strict nécessaire, tout est léger
+    PageTransition.init();
     initSmoothScroll();
     initNavigation();
     initFullscreenMenu();
-    initRevealAnimations();
-    PageTransition.init();
-    initProjectModal();
-    initImageParallax(prefersReducedMotion);
-    initTitleReveal(prefersReducedMotion);
-    initScrollFX(prefersReducedMotion);
-    initServiceCardsGlow(isTouchDevice);
-    initButtonGlow(isTouchDevice);
-    initBentoGlow(isTouchDevice);
-    initLightbox();
-    initServicesCarousel();
-    initAnimationPause();
+    initCustomCursor(isTouchDevice);
+    initAmbientCanvas(prefersReducedMotion);
+    initScrollFX(isTouchDevice, prefersReducedMotion);
+
+    // Différé : DOM churn et observers, étalés pendant le loader
+    scheduleInits([
+        () => initTitleReveal(prefersReducedMotion),
+        () => initRevealAnimations(),
+        () => initProjectModal(),
+        () => initImageParallax(isTouchDevice, prefersReducedMotion),
+        () => initServiceCardsGlow(isTouchDevice),
+        () => initButtonGlow(isTouchDevice),
+        () => initBentoGlow(isTouchDevice),
+        () => initLightbox(),
+        () => initServicesCarousel(),
+        () => initAnimationPause()
+    ]);
 });
 
 /* ----------------------------------------
@@ -39,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
    ---------------------------------------- */
 function initAnimationPause() {
     const els = document.querySelectorAll(
-        '.marquee, .spin-star, .hero__scroll-line, .about__badge-dot, .contact__status-dot'
+        '.marquee, .hero__scroll-line, .about__badge-dot, .contact__status-dot'
     );
     if (!els.length) return;
 
@@ -110,10 +139,13 @@ function initTitleReveal(prefersReducedMotion) {
    Une seule boucle rAF : barre de lecture
    et skew du marquee selon la vélocité
    ---------------------------------------- */
-function initScrollFX(prefersReducedMotion) {
+function initScrollFX(isTouchDevice, prefersReducedMotion) {
     const bar = document.querySelector('.scroll-progress');
-    const marquee = document.querySelector('.marquee');
-    const heroBgText = document.querySelector('.hero__bg-text');
+    // Skew du marquee et parallax du hero : cosmétiques, désactivés sur
+    // tactile pour ne rien écrire pendant le scroll (écrans 120 Hz)
+    const skipFX = isTouchDevice || prefersReducedMotion;
+    const marquee = skipFX ? null : document.querySelector('.marquee');
+    const heroBgText = skipFX ? null : document.querySelector('.hero__bg-text');
     if (!bar && !marquee && !heroBgText) return;
 
     let max = 1;
@@ -141,7 +173,7 @@ function initScrollFX(prefersReducedMotion) {
                 }
             }
 
-            if (marquee && !prefersReducedMotion) {
+            if (marquee) {
                 const target = Math.max(-6, Math.min(6, (y - lastY) * 0.35));
                 skew += (target - skew) * 0.1;
                 if (Math.abs(skew) < 0.02 && target === 0) skew = 0;
@@ -149,7 +181,7 @@ function initScrollFX(prefersReducedMotion) {
                 marquee.style.transform = `rotate(-1.2deg) skewX(${skew.toFixed(2)}deg)`;
             }
 
-            if (heroBgText && !prefersReducedMotion && y < window.innerHeight) {
+            if (heroBgText && y < window.innerHeight) {
                 heroBgText.style.transform = `translate(-50%, calc(-50% + ${(y * 0.3).toFixed(1)}px))`;
             }
 
@@ -262,8 +294,13 @@ function initAmbientCanvas(prefersReducedMotion) {
     let raf = null;
 
     const frame = () => {
-        t += 0.0035;
-        draw(t);
+        // Inutile de dessiner sous un calque opaque (loader, rideau)
+        const covered = document.body.classList.contains('loading') ||
+                        document.body.classList.contains('is-transitioning');
+        if (!covered) {
+            t += 0.0035;
+            draw(t);
+        }
         raf = requestAnimationFrame(frame);
     };
 
@@ -284,11 +321,13 @@ function initAmbientCanvas(prefersReducedMotion) {
    S'applique aux images [data-parallax-img]
    dans un conteneur overflow:hidden
    ---------------------------------------- */
-function initImageParallax(prefersReducedMotion) {
+function initImageParallax(isTouchDevice, prefersReducedMotion) {
     const imgs = document.querySelectorAll('[data-parallax-img]');
     if (!imgs.length) return;
 
-    if (prefersReducedMotion) {
+    // Tactile : pas de parallax (lectures de rect + raster agrandi x1.14
+    // pendant le scroll pour un effet à peine perceptible au doigt)
+    if (isTouchDevice || prefersReducedMotion) {
         imgs.forEach(img => { img.style.transform = 'none'; });
         return;
     }
@@ -382,6 +421,7 @@ function initLoader() {
     const loaderStartTime = Date.now();
     let progress = 0;
     let targetProgress = 0;
+    let lastDisplayProgress = -1;
     let animationFrame = null;
     
     // Déclencher l'animation du SVG
@@ -397,7 +437,12 @@ function initLoader() {
         
         const displayProgress = Math.min(Math.round(progress), 100);
         if (progressBar) progressBar.style.transform = `scaleX(${(progress / 100).toFixed(4)})`;
-        if (percentText) percentText.textContent = `${displayProgress}%`;
+        // Le compteur est un texte géant : on ne le réécrit (layout + raster)
+        // que quand le pourcentage entier change
+        if (percentText && displayProgress !== lastDisplayProgress) {
+            percentText.textContent = `${displayProgress}%`;
+            lastDisplayProgress = displayProgress;
+        }
         
         if (Math.abs(diff) > 0.05) {
             animationFrame = requestAnimationFrame(updateProgressSmooth);
@@ -432,9 +477,12 @@ function initLoader() {
     const hideLoader = () => {
         const elapsedTime = Date.now() - loaderStartTime;
         const remainingTime = Math.max(0, MIN_LOADER_TIME - elapsedTime);
-        
+
         // Attendre le délai minimal ET la fin du chargement réel
         setTimeout(() => {
+            // Dernier moment utile : la file d'inits a eu tout le temps du
+            // loader pour se drainer, on ne solde que l'éventuel reliquat
+            flushPendingInits();
             targetProgress = 100;
             if (!animationFrame) {
                 animationFrame = requestAnimationFrame(updateProgressSmooth);
@@ -771,6 +819,8 @@ const PageTransition = {
         this.element.classList.toggle('is-reverse', reverse);
         this.element.classList.remove('is-animating-out');
         this.element.classList.add('is-animating-in');
+        // Coupe le rendu des calques cachés sous le rideau (grain, canvas)
+        document.body.classList.add('is-transitioning');
 
         setTimeout(() => {
             // Contenu échangé pendant que l'écran est couvert
@@ -781,6 +831,7 @@ const PageTransition = {
 
             setTimeout(() => {
                 this.element.classList.remove('is-animating-out', 'is-reverse');
+                document.body.classList.remove('is-transitioning');
                 this.isAnimating = false;
             }, this.OUT_MS);
         }, this.COVER_MS);
@@ -1079,7 +1130,7 @@ function initProjectModal() {
         });
     }
 
-    function updateModalContent(project) {
+    function updateModalContent(project, deferHeroIn = false) {
         heroEl.classList.remove('is-in');
 
         modal.querySelector('.project-modal__number').textContent = project.number;
@@ -1144,8 +1195,15 @@ function initProjectModal() {
         watchReveal(modal.querySelector('.pm-footer'));
 
         container.scrollTop = 0;
-        freshUntil = performance.now() + 1400;
+        // Fenêtre élargie quand le contenu est pré-construit avant le rideau
+        freshUntil = performance.now() + (deferHeroIn ? 2200 : 1400);
 
+        if (!deferHeroIn) playHeroIn();
+    }
+
+    // L'entrée du hero est déclenchée séparément quand le modal est
+    // pré-construit caché (visibility: hidden laisse tourner les transitions)
+    function playHeroIn() {
         if (prefersReducedMotion) {
             heroEl.classList.add('is-in');
         } else {
@@ -1157,12 +1215,16 @@ function initProjectModal() {
         const project = projectsData[projectId];
         if (!project) return;
 
-        PageTransition.animate(() => {
-            currentProjectIndex = projectKeys.indexOf(projectId);
-            updateModalContent(project);
+        // Le DOM du modal (~50ms sur mobile) est construit et mis en page
+        // AVANT le départ du rideau : l'animation part sur un thread libre
+        currentProjectIndex = projectKeys.indexOf(projectId);
+        updateModalContent(project, true);
+        void container.offsetHeight;
 
+        PageTransition.animate(() => {
             modal.classList.add('active');
             document.body.classList.add('modal-open');
+            playHeroIn();
         }, false, { kicker: `Étude de cas — № ${project.number}`, word: project.title });
     }
 

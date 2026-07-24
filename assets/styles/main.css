@@ -276,17 +276,12 @@ em {
     margin-left: 0.18em;
     vertical-align: 0.5em;
     color: var(--color-accent);
-    animation: spinStar 14s linear infinite;
 }
 
 .spin-star svg {
     display: block;
     width: 100%;
     height: 100%;
-}
-
-@keyframes spinStar {
-    to { transform: rotate(360deg); }
 }
 
 /* ----------------------------------------
@@ -648,8 +643,10 @@ em {
    Hero Section
    ---------------------------------------- */
 .hero{
+    /* svh (stable) et non dvh : dvh change quand la barre d'URL mobile
+       apparaît/disparaît -> relayout de toute la page en plein scroll */
     min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -2305,7 +2302,7 @@ em {
    ---------------------------------------- */
 .testimonials {
     min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100svh;
     display: flex;
     align-items: center;
     padding: var(--space-3xl) var(--container-padding);
@@ -2553,7 +2550,7 @@ em {
    ---------------------------------------- */
 .contact {
     min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -3854,6 +3851,24 @@ em {
     animation: grainShift 1.2s steps(1) infinite;
 }
 
+/* Grain : en pause pendant le chargement (il recouvre le loader),
+   masqué sous le rideau de transition (overdraw inutile), statique et
+   non surdimensionné sur tactile (calque 150vw recomposité 8x/s) */
+body.loading .noise-overlay {
+    animation-play-state: paused;
+}
+
+body.is-transitioning .noise-overlay {
+    visibility: hidden;
+}
+
+@media (pointer: coarse) {
+    .noise-overlay {
+        animation: none;
+        inset: 0;
+    }
+}
+
 @keyframes grainShift {
     0%    { transform: translate(0, 0); }
     12.5% { transform: translate(-2%, -3%); }
@@ -3910,6 +3925,30 @@ em {
     transform: translateY(0);
 }
 
+/* Tactile : révélation du titre en un seul calque — le per-word crée
+   des dizaines de calques transitionnés d'un coup (à-coups de scroll) */
+@media (pointer: coarse) {
+    .title-anim .word {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .title-anim .section-header__title,
+    .title-anim .contact__title {
+        opacity: 0;
+        transform: translateY(24px);
+        transition: opacity 0.6s var(--ease-out-expo),
+                    transform 0.6s var(--ease-out-expo);
+    }
+
+    .title-anim.title-revealed .section-header__title,
+    .title-anim.title-revealed .contact__title {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* ----------------------------------------
    Page Transition — double rideau incliné
    Animé uniquement en translateX (compositor-only) : la diagonale
@@ -3927,7 +3966,8 @@ em {
     position: absolute;
     inset: 0;
     transform: translateX(147%);
-    will-change: transform;
+    /* pas de will-change permanent : l'animation promeut ses calques
+       toute seule, inutile de garder 2 calques plein écran alloués */
 }
 
 /* Lames diagonales soudées aux bords du panneau (1px de recouvrement
@@ -3961,6 +4001,14 @@ em {
 }
 
 /* Grain pellicule sur le rideau — même matière que le reste du site */
+/* Tactile : grain du rideau supprimé (gros calque animé pendant la
+   transition, invisible à 0.05 d'opacité sur petit écran) */
+@media (pointer: coarse) {
+    .page-transition__texture {
+        display: none;
+    }
+}
+
 .page-transition__texture {
     position: absolute;
     inset: -25%;
@@ -4248,10 +4296,6 @@ em {
     }
 
     .noise-overlay {
-        animation: none;
-    }
-
-    .spin-star {
         animation: none;
     }
 
