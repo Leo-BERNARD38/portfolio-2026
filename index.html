@@ -777,7 +777,7 @@
         </div>
     </section>
 
-    <!-- Project Modal -->
+    <!-- Project Modal — Étude de cas -->
     <div class="project-modal" id="projectModal">
         <div class="project-modal__backdrop"></div>
         <div class="project-modal__container">
@@ -786,69 +786,70 @@
                     <path d="M18 6L6 18M6 6l12 12"/>
                 </svg>
             </button>
-            
+
             <div class="project-modal__content">
-                <div class="project-modal__header">
-                    <span class="project-modal__number mono-text">01</span>
+                <!-- En-tête étude de cas -->
+                <header class="pm-hero">
+                    <span class="project-modal__number" aria-hidden="true">01</span>
+                    <div class="pm-hero__meta mono-text">
+                        <span class="pm-hero__index"><span class="pm-hero__index-current">01</span><span class="pm-hero__index-total">/06</span></span>
+                        <span class="pm-hero__rule" aria-hidden="true"></span>
+                        <span class="pm-hero__kicker">Étude de cas</span>
+                    </div>
+                    <h2 class="project-modal__title"></h2>
+                    <p class="project-modal__subtitle"></p>
                     <div class="project-modal__tags"></div>
-                </div>
-                
-                <h2 class="project-modal__title"></h2>
-                <p class="project-modal__subtitle"></p>
-                
-                <div class="project-modal__image">
-                    <div class="project-modal__image-placeholder">
-                        <span class="mono-text">PROJECT.WEBP</span>
+                </header>
+
+                <!-- Colophon : méta du projet -->
+                <dl class="pm-colophon">
+                    <div class="pm-colophon__item">
+                        <dt class="mono-text">Année</dt>
+                        <dd class="project-modal__year"></dd>
                     </div>
-                </div>
-                
-                <div class="project-modal__details">
-                    <div class="project-modal__info">
-                        <div class="project-modal__info-item">
-                            <span class="mono-text">ANNÉE</span>
-                            <p class="project-modal__year"></p>
-                        </div>
-                        <div class="project-modal__info-item">
-                            <span class="mono-text">RÔLE</span>
-                            <p class="project-modal__role"></p>
-                        </div>
-                        <div class="project-modal__info-item">
-                            <span class="mono-text">CONTEXTE</span>
-                            <p class="project-modal__context"></p>
-                        </div>
-                        <div class="project-modal__info-item project-modal__links-container" style="display: none;">
-                            <span class="mono-text">LIENS</span>
-                            <div class="project-modal__links"></div>
-                        </div>
+                    <div class="pm-colophon__item">
+                        <dt class="mono-text">Rôle</dt>
+                        <dd class="project-modal__role"></dd>
                     </div>
-                    
-                    <div class="project-modal__description"></div>
-                    
-                    <div class="project-modal__stack">
-                        <span class="mono-text">TECHNOLOGIES</span>
-                        <div class="project-modal__stack-list"></div>
+                    <div class="pm-colophon__item">
+                        <dt class="mono-text">Contexte</dt>
+                        <dd class="project-modal__context"></dd>
                     </div>
+                    <div class="pm-colophon__item project-modal__links-container" style="display: none;">
+                        <dt class="mono-text">Liens</dt>
+                        <dd><div class="project-modal__links"></div></dd>
+                    </div>
+                </dl>
+
+                <!-- Corps éditorial : blocs injectés par projet -->
+                <div class="pm-body"></div>
+
+                <!-- Stack -->
+                <div class="project-modal__stack">
+                    <span class="mono-text">Technologies</span>
+                    <div class="project-modal__stack-list"></div>
                 </div>
-                
-                <div class="project-modal__actions">
-                    <!-- Dynamic buttons will be injected here -->
-                </div>
-                
-                <!-- Navigation intégrée dans le contenu scrollable -->
-                <div class="project-modal__nav">
-                    <button class="project-modal__nav-btn project-modal__nav-btn--prev" aria-label="Projet précédent">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                <!-- Navigation entre projets -->
+                <nav class="pm-footer" aria-label="Navigation entre projets">
+                    <button class="pm-footer__prev" aria-label="Projet précédent">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M19 12H5M12 19l-7-7 7-7"/>
                         </svg>
-                        <span class="mono-text">PRÉCÉDENT</span>
+                        <span class="mono-text">Précédent</span>
+                        <em class="pm-footer__prev-title"></em>
                     </button>
-                    <button class="project-modal__nav-btn project-modal__nav-btn--next" aria-label="Projet suivant">
-                        <span class="mono-text">SUIVANT</span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
+                    <button class="pm-footer__next" aria-label="Projet suivant">
+                        <span class="pm-footer__next-label mono-text">Projet suivant</span>
+                        <span class="pm-footer__next-title">
+                            <span class="pm-footer__next-num mono-text"></span>
+                            <span class="pm-footer__next-name"></span>
+                            <svg class="pm-footer__next-arrow" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
                     </button>
-                </div>
+                </nav>
             </div>
         </div>
     </div>
