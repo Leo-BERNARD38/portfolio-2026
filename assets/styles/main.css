@@ -18,6 +18,13 @@
     --color-accent: #ff4d00;
     --color-accent-hover: #ff6b2b;
     --color-accent-glow: rgba(255, 77, 0, 0.3);
+
+    /* Plaques : --color-bg = plaques profondes (héro, contact, où les
+       halos respirent), --color-bg-secondary = plaques de contenu
+       (projets, services), --color-bg-tertiary = surface des cartes.
+       Papier : les deux sections claires (à-propos, pied de page). */
+    --color-paper: #f4f1ec;
+    --color-ink: #12131a;
     
     /* Typography */
     --font-display: 'Playfair Display', Georgia, serif;
@@ -184,6 +191,8 @@ ul, ol {
     pointer-events: none;
     z-index: 99998;
     transform: translate3d(-100px, -100px, 0);
+    /* Comme le point : garde l'anneau visible sur les sections papier */
+    mix-blend-mode: difference;
     will-change: transform;
 }
 
@@ -1121,8 +1130,8 @@ em {
 .marquee {
     padding: var(--space-lg) 0;
     overflow: hidden;
-    background-color: #f4f1ec;
-    color: #12131a;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
     transform: rotate(-1.2deg);
     margin-block: var(--space-lg);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
@@ -1291,6 +1300,7 @@ em {
 .work {
     padding: var(--space-3xl) 0;
     position: relative;
+    background-color: var(--color-bg-secondary);
 }
 
 @media (max-width: 768px) {
@@ -1313,8 +1323,8 @@ em {
     position: relative;
     border-radius: 20px;
     overflow: hidden;
-    background: linear-gradient(145deg, var(--color-bg-secondary), var(--color-bg));
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    background-color: var(--color-bg-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     transition: transform 0.6s var(--ease-out-expo),
                 border-color 0.6s var(--ease-out-expo);
     cursor: pointer;
@@ -1560,7 +1570,7 @@ em {
 .bento-item__overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, var(--color-bg) 0%, transparent 60%);
+    background: linear-gradient(to top, var(--color-bg-tertiary) 0%, transparent 60%);
     opacity: 0;
     transition: opacity 0.4s ease;
 }
@@ -1573,7 +1583,7 @@ em {
     padding: var(--space-lg);
     position: relative;
     z-index: 2;
-    background: linear-gradient(to top, var(--color-bg) 0%, transparent 100%);
+    background: linear-gradient(to top, var(--color-bg-tertiary) 0%, transparent 100%);
 }
 
 .bento-item__tags {
@@ -1586,7 +1596,7 @@ em {
 /* Tags (grille projets, modale et à-propos) */
 .tag {
     padding: 6px 14px;
-    background-color: rgba(20, 20, 20, 0.65);
+    background-color: rgba(10, 10, 10, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 100px;
     font-family: var(--font-mono);
@@ -1681,12 +1691,12 @@ em {
    About Section
    ---------------------------------------- */
 .about {
-    --ink: #12131a;
+    --ink: var(--color-ink);
     --ink-soft: rgba(18, 19, 26, 0.72);
     --ink-muted: rgba(18, 19, 26, 0.45);
     --ink-border: rgba(18, 19, 26, 0.12);
     padding: var(--space-3xl) var(--container-padding);
-    background-color: #f4f1ec;
+    background-color: var(--color-paper);
     /* Trame de points façon papier millimétré - matière discrète */
     background-image: radial-gradient(rgba(18, 19, 26, 0.055) 1px, transparent 1px);
     background-size: 26px 26px;
@@ -1769,40 +1779,6 @@ em {
     will-change: transform;
 }
 
-.about__image-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(145deg, 
-        var(--color-bg-tertiary) 0%, 
-        var(--color-bg) 50%, 
-        rgba(255, 77, 0, 0.1) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-white-muted);
-}
-
-.about__badge {
-    position: absolute;
-    bottom: var(--space-lg);
-    left: var(--space-lg);
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-xs);
-    padding: 12px 20px;
-    background-color: var(--color-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 100px;
-}
-
-.about__badge-dot {
-    width: 10px;
-    height: 10px;
-    background-color: #00ff88;
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-}
-
 @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(1.2); }
@@ -1873,16 +1849,6 @@ em {
     .about__image-wrapper {
         aspect-ratio: 4/5;
         max-height: 60vh;
-    }
-    
-    .about__badge {
-        padding: 10px 16px;
-        bottom: var(--space-md);
-        left: var(--space-md);
-    }
-    
-    .about__badge .mono-text {
-        font-size: 10px;
     }
     
     .about__content-col {
@@ -1970,6 +1936,7 @@ em {
    ---------------------------------------- */
 .services {
     padding: var(--space-3xl) var(--container-padding);
+    background-color: var(--color-bg-secondary);
 }
 
 .services__grid {
@@ -2140,7 +2107,7 @@ em {
     padding: var(--space-2xl) var(--space-xl);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 24px;
-    background: linear-gradient(145deg, var(--color-bg-secondary), var(--color-bg));
+    background-color: var(--color-bg-tertiary);
     transition: transform 0.6s var(--ease-out-expo),
                 border-color 0.6s var(--ease-out-expo);
     position: relative;
@@ -2213,7 +2180,7 @@ em {
     font-size: clamp(8rem, 18vw, 14rem);
     font-weight: 700;
     color: transparent;
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.04);
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.06);
     letter-spacing: -0.05em;
     line-height: 0.8;
     pointer-events: none;
@@ -2884,8 +2851,11 @@ em {
 /* Footer papier - le site se referme sur une page claire */
 .footer {
     padding: var(--space-2xl) var(--container-padding) var(--space-lg);
-    background-color: #f4f1ec;
-    color: #12131a;
+    background-color: var(--color-paper);
+    /* Même matière que la page papier de l'à-propos */
+    background-image: radial-gradient(rgba(18, 19, 26, 0.055) 1px, transparent 1px);
+    background-size: 26px 26px;
+    color: var(--color-ink);
     position: relative;
 }
 
@@ -3874,48 +3844,6 @@ em {
     transform: translateY(0);
 }
 
-/* Noise texture overlay - grain animé façon pellicule
-   (élément surdimensionné + translate compositor-only, coût quasi nul) */
-.noise-overlay {
-    position: fixed;
-    inset: -25%;
-    pointer-events: none;
-    z-index: 99990;
-    opacity: 0.035;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    animation: grainShift 1.2s steps(1) infinite;
-}
-
-/* Grain : en pause pendant le chargement (il recouvre le loader),
-   masqué sous le rideau de transition (overdraw inutile), statique et
-   non surdimensionné sur tactile (calque 150vw recomposité 8x/s) */
-body.loading .noise-overlay {
-    animation-play-state: paused;
-}
-
-body.is-transitioning .noise-overlay {
-    visibility: hidden;
-}
-
-@media (pointer: coarse) {
-    .noise-overlay {
-        animation: none;
-        inset: 0;
-    }
-}
-
-@keyframes grainShift {
-    0%    { transform: translate(0, 0); }
-    12.5% { transform: translate(-2%, -3%); }
-    25%   { transform: translate(1%, -2%); }
-    37.5% { transform: translate(-3%, 1%); }
-    50%   { transform: translate(3%, 2%); }
-    62.5% { transform: translate(-1%, 3%); }
-    75%   { transform: translate(2%, -1%); }
-    87.5% { transform: translate(-2%, 2%); }
-    100%  { transform: translate(0, 0); }
-}
-
 /* Barre de progression de lecture */
 .scroll-progress {
     position: fixed;
@@ -4035,22 +3963,6 @@ body.is-transitioning .noise-overlay {
     background-color: var(--color-bg);
 }
 
-/* Grain pellicule sur le rideau — même matière que le reste du site */
-/* Tactile : grain du rideau supprimé (gros calque animé pendant la
-   transition, invisible à 0.05 d'opacité sur petit écran) */
-@media (pointer: coarse) {
-    .page-transition__texture {
-        display: none;
-    }
-}
-
-.page-transition__texture {
-    position: absolute;
-    inset: -25%;
-    opacity: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
 /* Cartouche éditorial central : monogramme, kicker, titre en italique */
 .page-transition__center {
     position: absolute;
@@ -4110,11 +4022,6 @@ body.is-transitioning .noise-overlay {
     animation: curtainIn 0.72s cubic-bezier(0.76, 0, 0.24, 1) 0.09s both;
 }
 
-.page-transition.is-animating-in .page-transition__texture {
-    animation: grainShift 1.2s steps(1) infinite,
-               textureIn 0.4s ease 0.35s both;
-}
-
 .page-transition.is-animating-in .page-transition__mark {
     animation: centerIn 0.6s var(--ease-out-expo) 0.3s both;
 }
@@ -4135,11 +4042,6 @@ body.is-transitioning .noise-overlay {
 
 .page-transition.is-animating-out .page-transition__panel--accent {
     animation: curtainOut 0.72s cubic-bezier(0.76, 0, 0.24, 1) 0.09s both;
-}
-
-.page-transition.is-animating-out .page-transition__texture {
-    animation: grainShift 1.2s steps(1) infinite,
-               textureOut 0.25s ease both;
 }
 
 .page-transition.is-animating-out .page-transition__center > * {
@@ -4216,16 +4118,6 @@ body.is-transitioning .noise-overlay {
     to   { opacity: 0; transform: translateX(90px); }
 }
 
-@keyframes textureIn {
-    from { opacity: 0; }
-    to   { opacity: 0.05; }
-}
-
-@keyframes textureOut {
-    from { opacity: 0.05; }
-    to   { opacity: 0; }
-}
-
 /* Mouvement réduit : simple fondu sombre, pas de balayage ni de cartouche */
 @media (prefers-reduced-motion: reduce) {
     .page-transition::before {
@@ -4242,7 +4134,6 @@ body.is-transitioning .noise-overlay {
     }
 
     .page-transition__panel,
-    .page-transition__texture,
     .page-transition__center > * {
         animation: none !important;
     }
@@ -4328,10 +4219,6 @@ body.is-transitioning .noise-overlay {
 
     .marquee {
         transform: none;
-    }
-
-    .noise-overlay {
-        animation: none;
     }
 
     .title-anim .word,

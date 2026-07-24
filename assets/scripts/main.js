@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavContrast();
     initFullscreenMenu();
     initCustomCursor(isTouchDevice);
-    initAmbientCanvas(prefersReducedMotion);
+    initAmbientCanvas();
     initScrollFX(isTouchDevice, prefersReducedMotion);
 
     // Différé : DOM churn et observers, étalés pendant le loader
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
    ---------------------------------------- */
 function initAnimationPause() {
     const els = document.querySelectorAll(
-        '.marquee, .hero__scroll-line, .about__badge-dot, .contact__status-dot'
+        '.marquee, .hero__scroll-line, .contact__status-dot'
     );
     if (!els.length) return;
 
@@ -249,21 +249,15 @@ function rafThrottle(fn) {
    résolution (l'upscale CSS fait office de
    blur gratuit) - remplace filter: blur(100px)
    ---------------------------------------- */
-function initAmbientCanvas(prefersReducedMotion) {
+function initAmbientCanvas() {
     const canvas = document.querySelector('.ambient-canvas');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     const scale = 0.06;
+    const T = 0.9; // instant figé choisi pour la composition des halos
     let w = 0;
     let h = 0;
-
-    const resize = () => {
-        w = canvas.width = Math.max(24, Math.ceil(window.innerWidth * scale));
-        h = canvas.height = Math.max(24, Math.ceil(window.innerHeight * scale));
-    };
-    resize();
-    window.addEventListener('resize', resize);
 
     const blobs = [
         { x: 0.88, y: 0.10, r: 0.52, a: 0.11, dx: 0.9,  dy: 1.3, ph: 0.0 },
@@ -286,37 +280,15 @@ function initAmbientCanvas(prefersReducedMotion) {
         }
     };
 
-    if (prefersReducedMotion) {
-        draw(0);
-        return;
-    }
-
-    let t = 0;
-    let raf = null;
-    let tick = 0;
-
-    const frame = () => {
-        // Inutile de dessiner sous un calque opaque (loader, rideau) ;
-        // les halos dérivent lentement : un dessin sur deux suffit
-        const covered = document.body.classList.contains('loading') ||
-                        document.body.classList.contains('is-transitioning');
-        if (!covered && (tick++ & 1) === 0) {
-            t += 0.007;
-            draw(t);
-        }
-        raf = requestAnimationFrame(frame);
+    // Halos figés : dessinés une fois, redessinés au redimensionnement.
+    // Aucune boucle rAF permanente sur le site.
+    const render = () => {
+        w = canvas.width = Math.max(24, Math.ceil(window.innerWidth * scale));
+        h = canvas.height = Math.max(24, Math.ceil(window.innerHeight * scale));
+        draw(T);
     };
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            cancelAnimationFrame(raf);
-            raf = null;
-        } else if (!raf) {
-            raf = requestAnimationFrame(frame);
-        }
-    });
-
-    raf = requestAnimationFrame(frame);
+    render();
+    window.addEventListener('resize', render);
 }
 
 /* ----------------------------------------
@@ -871,8 +843,6 @@ const PageTransition = {
         this.element.classList.toggle('is-reverse', reverse);
         this.element.classList.remove('is-animating-out');
         this.element.classList.add('is-animating-in');
-        // Coupe le rendu des calques cachés sous le rideau (grain, canvas)
-        document.body.classList.add('is-transitioning');
 
         setTimeout(() => {
             // Contenu échangé pendant que l'écran est couvert
@@ -883,7 +853,6 @@ const PageTransition = {
 
             setTimeout(() => {
                 this.element.classList.remove('is-animating-out', 'is-reverse');
-                document.body.classList.remove('is-transitioning');
                 this.isAnimating = false;
             }, this.OUT_MS);
         }, this.COVER_MS);
