@@ -292,13 +292,15 @@ function initAmbientCanvas(prefersReducedMotion) {
 
     let t = 0;
     let raf = null;
+    let tick = 0;
 
     const frame = () => {
-        // Inutile de dessiner sous un calque opaque (loader, rideau)
+        // Inutile de dessiner sous un calque opaque (loader, rideau) ;
+        // les halos dérivent lentement : un dessin sur deux suffit
         const covered = document.body.classList.contains('loading') ||
                         document.body.classList.contains('is-transitioning');
-        if (!covered) {
-            t += 0.0035;
+        if (!covered && (tick++ & 1) === 0) {
+            t += 0.007;
             draw(t);
         }
         raf = requestAnimationFrame(frame);
@@ -594,20 +596,15 @@ function initCustomCursor(isTouchDevice) {
         }
     });
     
-    // Interactive elements
-    const interactiveElements = document.querySelectorAll('a, button, .bento-item, [data-cursor="hover"]');
-    
-    interactiveElements.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            cursor.classList.add('active');
-            follower.classList.add('active');
-        });
-        
-        el.addEventListener('mouseleave', () => {
-            cursor.classList.remove('active');
-            follower.classList.remove('active');
-        });
-    });
+    // Délégation : 2 listeners globaux couvrent tous les éléments
+    // interactifs, présents comme futurs (modal, lightbox...) — plus
+    // aucun câblage manuel élément par élément
+    const HOVER_SELECTOR = 'a, button, .bento-item, [data-cursor="hover"], .pm-figure__frame';
+    document.addEventListener('pointerover', (e) => {
+        const on = !!e.target.closest(HOVER_SELECTOR);
+        cursor.classList.toggle('active', on);
+        follower.classList.toggle('active', on);
+    }, { passive: true });
     
     // Hide cursor when leaving window
     document.addEventListener('mouseleave', () => {
@@ -1011,17 +1008,6 @@ function initProjectModal() {
     let currentProjectIndex = 0;
     let freshUntil = 0;
 
-    function bindCursorHover(el) {
-        el.addEventListener('mouseenter', () => {
-            document.querySelector('.cursor')?.classList.add('active');
-            document.querySelector('.cursor-follower')?.classList.add('active');
-        });
-        el.addEventListener('mouseleave', () => {
-            document.querySelector('.cursor')?.classList.remove('active');
-            document.querySelector('.cursor-follower')?.classList.remove('active');
-        });
-    }
-
     // Révélation des blocs au scroll — root = conteneur scrollable de la modale.
     // Juste après un changement de contenu (freshUntil), les blocs visibles
     // reçoivent un délai en cascade pour une entrée orchestrée.
@@ -1064,7 +1050,6 @@ function initProjectModal() {
         frame.appendChild(img);
         frame.appendChild(overlay);
         frame.addEventListener('click', () => openLightbox(src, alt));
-        bindCursorHover(frame);
         fig.appendChild(frame);
         return fig;
     }
@@ -1155,30 +1140,52 @@ function initProjectModal() {
         });
     }
 
+    // Références du shell résolues une seule fois
+    const refs = {
+        number: modal.querySelector('.project-modal__number'),
+        indexCurrent: modal.querySelector('.pm-hero__index-current'),
+        indexTotal: modal.querySelector('.pm-hero__index-total'),
+        title: modal.querySelector('.project-modal__title'),
+        subtitle: modal.querySelector('.project-modal__subtitle'),
+        year: modal.querySelector('.project-modal__year'),
+        role: modal.querySelector('.project-modal__role'),
+        context: modal.querySelector('.project-modal__context'),
+        tags: modal.querySelector('.project-modal__tags'),
+        stackList: modal.querySelector('.project-modal__stack-list'),
+        links: modal.querySelector('.project-modal__links'),
+        linksWrapper: modal.querySelector('.project-modal__links-container'),
+        colophon: modal.querySelector('.pm-colophon'),
+        stack: modal.querySelector('.project-modal__stack'),
+        footer: modal.querySelector('.pm-footer'),
+        prevTitle: modal.querySelector('.pm-footer__prev-title'),
+        nextNum: modal.querySelector('.pm-footer__next-num'),
+        nextName: modal.querySelector('.pm-footer__next-name')
+    };
+
     function updateModalContent(projectId, deferHeroIn = false) {
         const project = projectsData[projectId];
         heroEl.classList.remove('is-in');
 
-        modal.querySelector('.project-modal__number').textContent = project.number;
-        modal.querySelector('.pm-hero__index-current').textContent = project.number;
-        modal.querySelector('.pm-hero__index-total').textContent = `/${pad(projectKeys.length)}`;
-        modal.querySelector('.project-modal__title').textContent = project.title;
-        modal.querySelector('.project-modal__subtitle').textContent = project.subtitle;
-        modal.querySelector('.project-modal__year').textContent = project.year;
-        modal.querySelector('.project-modal__role').textContent = project.role;
-        modal.querySelector('.project-modal__context').textContent = project.context;
+        refs.number.textContent = project.number;
+        refs.indexCurrent.textContent = project.number;
+        refs.indexTotal.textContent = `/${pad(projectKeys.length)}`;
+        refs.title.textContent = project.title;
+        refs.subtitle.textContent = project.subtitle;
+        refs.year.textContent = project.year;
+        refs.role.textContent = project.role;
+        refs.context.textContent = project.context;
 
-        modal.querySelector('.project-modal__tags').innerHTML = project.tags.map(tag =>
+        refs.tags.innerHTML = project.tags.map(tag =>
             `<span class="tag mono-text">${tag}</span>`
         ).join('');
 
-        modal.querySelector('.project-modal__stack-list').innerHTML = project.stack.map(tech =>
+        refs.stackList.innerHTML = project.stack.map(tech =>
             `<span class="tag mono-text">${tech}</span>`
         ).join('');
 
         // Liens dans le colophon
-        const linksContainer = modal.querySelector('.project-modal__links');
-        const linksWrapper = modal.querySelector('.project-modal__links-container');
+        const linksContainer = refs.links;
+        const linksWrapper = refs.linksWrapper;
         if (linksContainer && linksWrapper) {
             linksContainer.innerHTML = '';
             if (project.links && project.links.length > 0) {
@@ -1197,7 +1204,6 @@ function initProjectModal() {
                         </svg>
                         <span>${link.label}</span>
                     `;
-                    bindCursorHover(btn);
                     linksContainer.appendChild(btn);
                 });
             } else {
@@ -1211,14 +1217,14 @@ function initProjectModal() {
         const n = projectKeys.length;
         const prevProject = projectsData[projectKeys[(currentProjectIndex - 1 + n) % n]];
         const nextProject = projectsData[projectKeys[(currentProjectIndex + 1) % n]];
-        modal.querySelector('.pm-footer__prev-title').textContent = prevProject.title;
-        modal.querySelector('.pm-footer__next-num').textContent = `№ ${nextProject.number}`;
-        modal.querySelector('.pm-footer__next-name').textContent = nextProject.title;
+        refs.prevTitle.textContent = prevProject.title;
+        refs.nextNum.textContent = `№ ${nextProject.number}`;
+        refs.nextName.textContent = nextProject.title;
 
         // Révélation des éléments fixes
-        watchReveal(modal.querySelector('.pm-colophon'));
-        watchReveal(modal.querySelector('.project-modal__stack'));
-        watchReveal(modal.querySelector('.pm-footer'));
+        watchReveal(refs.colophon);
+        watchReveal(refs.stack);
+        watchReveal(refs.footer);
 
         container.scrollTop = 0;
         // Fenêtre élargie quand le contenu est pré-construit avant le rideau
@@ -1299,6 +1305,50 @@ function initProjectModal() {
     // Pré-construit les 6 corps de projets pendant le loader (idle) :
     // toute ouverture ultérieure est un simple afficher/masquer
     scheduleInits(projectKeys.map(key => () => ensureBuilt(key)));
+
+    // Préchargement de toutes les images projets (~450 Ko en mobile) :
+    // après le chargement complet, en idle, une image à la fois. Le
+    // survol d'une carte fait passer son projet en tête de file. Le
+    // décodage, lui, n'a lieu qu'à l'affichage (mémoire GPU).
+    function initProjectPrefetch() {
+        if (navigator.connection && navigator.connection.saveData) return;
+
+        let queue = [];
+        projectKeys.forEach(key => {
+            (projectsData[key].blocks || []).forEach(block => {
+                const srcs = block.type === 'image' ? [block.src]
+                           : block.type === 'duo' ? block.images : [];
+                srcs.forEach(src => queue.push({ key, src }));
+            });
+        });
+
+        const holder = []; // garde les Image vivantes jusqu'au onload
+        const idle = (cb) => ('requestIdleCallback' in window)
+            ? requestIdleCallback(cb, { timeout: 2000 })
+            : setTimeout(cb, 250);
+
+        const next = () => {
+            const item = queue.shift();
+            if (!item) return;
+            const img = new Image();
+            img.onload = img.onerror = () => idle(next);
+            img.sizes = '(max-width: 1240px) 100vw, 1160px';
+            img.srcset = `${item.src.replace('.webp', '-960.webp')} 960w, ${item.src} 1920w`;
+            holder.push(img);
+        };
+
+        if (document.readyState === 'complete') idle(next);
+        else window.addEventListener('load', () => idle(next), { once: true });
+
+        projectItems.forEach(item => {
+            item.addEventListener('pointerenter', () => {
+                const key = item.dataset.project;
+                queue = queue.filter(q => q.key === key)
+                    .concat(queue.filter(q => q.key !== key));
+            }, { passive: true });
+        });
+    }
+    initProjectPrefetch();
 }
 
 /* ----------------------------------------
@@ -1342,25 +1392,6 @@ function initLightbox() {
 
     closeBtn.addEventListener('click', closeLightbox);
 
-    // Custom Cursor for Close Button
-    closeBtn.addEventListener('mouseenter', () => {
-        const cursor = document.querySelector('.cursor');
-        const follower = document.querySelector('.cursor-follower');
-        if (cursor && follower) {
-            cursor.classList.add('active');
-            follower.classList.add('active');
-        }
-    });
-    
-    closeBtn.addEventListener('mouseleave', () => {
-        const cursor = document.querySelector('.cursor');
-        const follower = document.querySelector('.cursor-follower');
-        if (cursor && follower) {
-            cursor.classList.remove('active');
-            follower.classList.remove('active');
-        }
-    });
-
     lightbox.addEventListener('click', (e) => {
         if (e.target === lightbox) closeLightbox();
     });
@@ -1373,13 +1404,18 @@ function initLightbox() {
 
 function openLightbox(src, alt) {
     const lightbox = document.getElementById('lightbox');
+    if (!lightbox) return;
     const img = lightbox.querySelector('.lightbox__img');
-    
-    if (!lightbox || !img) return;
+    if (!img) return;
 
     img.src = src;
     img.alt = alt || '';
-    lightbox.classList.add('active');
+
+    // L'image plein format est décodée AVANT le fondu : pas d'accroc
+    // ni d'apparition en deux temps pendant l'animation
+    const show = () => lightbox.classList.add('active');
+    if (img.decode) img.decode().then(show, show);
+    else show();
 }
 
 /* ----------------------------------------
