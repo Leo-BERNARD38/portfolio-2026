@@ -127,10 +127,11 @@
             overflow: hidden;
         }
         .loader__progress-bar {
-            width: 0%;
+            width: 100%;
             height: 100%;
             background-color: var(--color-bg);
-            transition: width 0.1s ease-out;
+            transform: scaleX(0);
+            transform-origin: left;
         }
         .loader__name {
             font-family: var(--font-body);
@@ -182,10 +183,10 @@
         }
     </style>
     <!-- Non-critical CSS (Loaded asynchronously) -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="assets/styles/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="assets/styles/main.css">
     </noscript>
 
@@ -408,7 +409,7 @@
             <article class="bento-item bento-item--large" data-project="optiwits" tabindex="0" role="button" aria-label="Voir le projet OptiWITS">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/optiwits.webp" alt="OptiWITS" loading="lazy">
+                        <img src="assets/images/optiwits.webp" alt="OptiWITS" width="1400" height="1400" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">01</span>
                         <div class="bento-item__arrow">
@@ -434,7 +435,7 @@
             <article class="bento-item bento-item--medium" data-project="ccp" tabindex="0" role="button" aria-label="Voir le projet Camping-Car Partner">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/ccp.webp" alt="Camping-Car Partner" loading="lazy">
+                        <img src="assets/images/ccp.webp" alt="Camping-Car Partner" width="1600" height="893" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">02</span>
                         <div class="bento-item__arrow">
@@ -460,7 +461,7 @@
             <article class="bento-item bento-item--medium" data-project="modnation" tabindex="0" role="button" aria-label="Voir le projet ModNation">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/modnation.webp" alt="ModNation" loading="lazy">
+                        <img src="assets/images/modnation.webp" alt="ModNation" width="1600" height="893" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">03</span>
                         <div class="bento-item__arrow">
@@ -486,7 +487,7 @@
             <article class="bento-item bento-item--small" data-project="portfolio" tabindex="0" role="button" aria-label="Voir le projet Portfolio 2025">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/portfolio.webp" alt="Portfolio" loading="lazy">
+                        <img src="assets/images/portfolio.webp" alt="Portfolio" width="1400" height="1400" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">04</span>
                         <div class="bento-item__arrow">
@@ -506,7 +507,7 @@
             <article class="bento-item bento-item--small" data-project="secret" tabindex="0" role="button" aria-label="Voir le projet secret">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/secret.webp" alt="Secret Project" loading="lazy">
+                        <img src="assets/images/secret.webp" alt="Secret Project" width="1400" height="1400" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">05</span>
                         <div class="bento-item__arrow">
@@ -526,7 +527,7 @@
             <article class="bento-item bento-item--wide" data-project="youtube" tabindex="0" role="button" aria-label="Voir le projet YouTube @WNT">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/youtube.webp" alt="YouTube @WNT" loading="lazy">
+                        <img src="assets/images/youtube.webp" alt="YouTube @WNT" width="1800" height="764" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">06</span>
                         <div class="bento-item__arrow">
@@ -555,7 +556,7 @@
         <div class="about__grid">
             <div class="about__image-col">
                 <div class="about__image-wrapper reveal-img">
-                    <img src="assets/images/profil.webp" alt="Léo BERNARD" class="about__img" data-parallax-img>
+                    <img src="assets/images/profil.webp" alt="Léo BERNARD" class="about__img" width="1200" height="1600" loading="lazy" decoding="async" data-parallax-img>
                 </div>
 
             </div>

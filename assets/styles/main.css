@@ -126,6 +126,16 @@ ul, ol {
     list-style: none;
 }
 
+/* Animations décoratives suspendues hors écran (classe posée par JS) */
+.anim-paused,
+.anim-paused *,
+.anim-paused::before,
+.anim-paused::after,
+.anim-paused *::before,
+.anim-paused *::after {
+    animation-play-state: paused !important;
+}
+
 ::selection {
     background-color: var(--color-accent);
     color: var(--color-white);

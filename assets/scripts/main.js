@@ -29,7 +29,27 @@ document.addEventListener('DOMContentLoaded', () => {
     initBentoGlow(isTouchDevice);
     initLightbox();
     initServicesCarousel();
+    initAnimationPause();
 });
+
+/* ----------------------------------------
+   Animations décoratives infinies (marquee,
+   étoile, pulses…) mises en pause quand
+   l'élément sort du viewport
+   ---------------------------------------- */
+function initAnimationPause() {
+    const els = document.querySelectorAll(
+        '.marquee, .spin-star, .hero__scroll-line, .about__badge-dot, .contact__status-dot'
+    );
+    if (!els.length) return;
+
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            entry.target.classList.toggle('anim-paused', !entry.isIntersecting);
+        });
+    });
+    els.forEach(el => io.observe(el));
+}
 
 /* ----------------------------------------
    Title Reveal - mot à mot
@@ -174,6 +194,22 @@ const Ticker = {
 window.addEventListener('scroll', Ticker.wake, { passive: true });
 window.addEventListener('resize', Ticker.wake, { passive: true });
 
+// Borne un handler à une exécution par frame (les événements souris
+// peuvent dépasser 60/s) — la dernière valeur reçue gagne
+function rafThrottle(fn) {
+    let pending = false;
+    let lastArgs = null;
+    return function (...args) {
+        lastArgs = args;
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {
+            pending = false;
+            fn.apply(this, lastArgs);
+        });
+    };
+}
+
 /* ----------------------------------------
    Ambient Canvas
    Halos oranges dessinés en très basse
@@ -311,14 +347,14 @@ function initBentoGlow(isTouchDevice) {
     const bentoItems = document.querySelectorAll('.bento-item');
 
     bentoItems.forEach(item => {
-        item.addEventListener('mousemove', (e) => {
+        item.addEventListener('mousemove', rafThrottle((e) => {
             const rect = item.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
 
             item.style.setProperty('--mouse-x', `${x}%`);
             item.style.setProperty('--mouse-y', `${y}%`);
-        });
+        }), { passive: true });
 
         item.addEventListener('mouseenter', function() {
             this.style.zIndex = '10';
@@ -360,7 +396,7 @@ function initLoader() {
         progress += diff * factor;
         
         const displayProgress = Math.min(Math.round(progress), 100);
-        if (progressBar) progressBar.style.width = `${progress}%`;
+        if (progressBar) progressBar.style.transform = `scaleX(${(progress / 100).toFixed(4)})`;
         if (percentText) percentText.textContent = `${displayProgress}%`;
         
         if (Math.abs(diff) > 0.05) {
@@ -959,6 +995,7 @@ function initProjectModal() {
         img.src = src;
         img.alt = alt;
         img.loading = 'lazy';
+        img.decoding = 'async';
         const overlay = document.createElement('div');
         overlay.className = 'pm-figure__overlay';
         frame.appendChild(img);
@@ -1253,14 +1290,14 @@ function initServiceCardsGlow(isTouchDevice) {
     const cards = document.querySelectorAll('.service-card');
     
     cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
+        card.addEventListener('mousemove', rafThrottle((e) => {
             const rect = card.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
-            
+
             card.style.setProperty('--mouse-x', `${x}%`);
             card.style.setProperty('--mouse-y', `${y}%`);
-        });
+        }), { passive: true });
     });
 }
 
@@ -1276,7 +1313,7 @@ function initButtonGlow(isTouchDevice) {
     wrappers.forEach(wrapper => {
         const btn = wrapper.querySelector('.btn');
 
-        wrapper.addEventListener('mousemove', (e) => {
+        wrapper.addEventListener('mousemove', rafThrottle((e) => {
             const rect = wrapper.getBoundingClientRect();
             // Normalize to -1 to 1 range (center = 0)
             const normalizedX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
@@ -1294,7 +1331,7 @@ function initButtonGlow(isTouchDevice) {
                 btn.style.transform =
                     `translate(${(normalizedX * 5).toFixed(1)}px, ${(normalizedY * 5).toFixed(1)}px) scale(1.02)`;
             }
-        });
+        }), { passive: true });
 
         wrapper.addEventListener('mouseleave', () => {
             // Smooth return to center
