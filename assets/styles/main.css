@@ -3867,20 +3867,45 @@ em {
 }
 
 /* ----------------------------------------
-   Page Transition
+   Page Transition — double rideau incliné
+   Animé uniquement en translateX (compositor-only) : la diagonale
+   signature vient de lames clipées statiques, pas d'un clip-path animé.
    ---------------------------------------- */
 .page-transition {
     position: fixed;
     inset: 0;
     z-index: 99999;
     pointer-events: none;
+    overflow: hidden;
 }
 
 .page-transition__panel {
     position: absolute;
     inset: 0;
-    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
-    will-change: clip-path;
+    transform: translateX(165%);
+    will-change: transform;
+}
+
+/* Lames diagonales soudées aux bords du panneau (1px de recouvrement
+   pour éviter tout liseré subpixel) */
+.page-transition__panel::before,
+.page-transition__panel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 46vw;
+    background-color: inherit;
+}
+
+.page-transition__panel::before {
+    right: calc(100% - 1px);
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.page-transition__panel::after {
+    left: calc(100% - 1px);
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
 }
 
 .page-transition__panel--accent {
@@ -3891,15 +3916,33 @@ em {
     background-color: var(--color-bg);
 }
 
-.page-transition__mark {
+/* Grain pellicule sur le rideau — même matière que le reste du site */
+.page-transition__texture {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 64px;
-    height: 64px;
-    transform: translate(-50%, -50%);
+    inset: -50%;
     opacity: 0;
-    z-index: 2;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Cartouche éditorial central : monogramme, kicker, titre en italique */
+.page-transition__center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--space-md);
+    text-align: center;
+}
+
+.page-transition__center > * {
+    opacity: 0;
+}
+
+.page-transition__mark {
+    width: 48px;
+    height: 48px;
 }
 
 .page-transition__mark svg {
@@ -3907,85 +3950,172 @@ em {
     height: 100%;
 }
 
-/* Entrée : l'orange ouvre la voie, le noir suit, le monogramme apparaît */
+.page-transition__kicker {
+    margin-top: var(--space-md);
+    font-size: 0.72rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+}
+
+.page-transition__word {
+    margin-top: 0.3em;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(2rem, 6vw, 4.2rem);
+    line-height: 1.1;
+    color: var(--color-white-soft, #f4f4f4);
+}
+
+.page-transition__kicker:empty,
+.page-transition__word:empty {
+    display: none;
+}
+
+/* Entrée : l'orange ouvre la voie, le noir suit, le cartouche glisse
+   dans le sens du rideau (droite → gauche) */
 .page-transition.is-animating-in .page-transition__panel--accent {
-    animation: transitionIn 0.65s var(--ease-in-out-circ) both;
+    animation: curtainIn 0.72s cubic-bezier(0.76, 0, 0.24, 1) both;
 }
 
 .page-transition.is-animating-in .page-transition__panel--dark {
-    animation: transitionIn 0.65s var(--ease-in-out-circ) 0.15s both;
+    animation: curtainIn 0.72s cubic-bezier(0.76, 0, 0.24, 1) 0.09s both;
+}
+
+.page-transition.is-animating-in .page-transition__texture {
+    animation: grainShift 1.2s steps(1) infinite,
+               textureIn 0.4s ease 0.35s both;
 }
 
 .page-transition.is-animating-in .page-transition__mark {
-    animation: markIn 0.35s ease 0.5s both;
+    animation: centerIn 0.6s var(--ease-out-expo) 0.3s both;
 }
 
-/* Sortie : le noir se retire d'abord, l'orange traîne derrière */
+.page-transition.is-animating-in .page-transition__kicker {
+    animation: centerIn 0.6s var(--ease-out-expo) 0.4s both;
+}
+
+.page-transition.is-animating-in .page-transition__word {
+    animation: centerIn 0.65s var(--ease-out-expo) 0.48s both;
+}
+
+/* Sortie : le noir se retire d'abord, l'orange traîne derrière,
+   le cartouche poursuit sa course vers la gauche */
 .page-transition.is-animating-out .page-transition__panel--dark {
-    animation: transitionOut 0.65s var(--ease-in-out-circ) both;
+    animation: curtainOut 0.72s cubic-bezier(0.76, 0, 0.24, 1) both;
 }
 
 .page-transition.is-animating-out .page-transition__panel--accent {
-    animation: transitionOut 0.65s var(--ease-in-out-circ) 0.15s both;
+    animation: curtainOut 0.72s cubic-bezier(0.76, 0, 0.24, 1) 0.09s both;
 }
 
-.page-transition.is-animating-out .page-transition__mark {
-    animation: markOut 0.2s ease both;
+.page-transition.is-animating-out .page-transition__texture {
+    animation: grainShift 1.2s steps(1) infinite,
+               textureOut 0.25s ease both;
 }
 
-/* Variantes inversées (fermeture de modale) */
+.page-transition.is-animating-out .page-transition__center > * {
+    animation: centerOut 0.4s cubic-bezier(0.5, 0, 0.75, 0) both;
+}
+
+/* Variantes inversées (fermeture de modale) : balayage gauche → droite */
 .page-transition.is-reverse.is-animating-in .page-transition__panel--accent {
-    animation: transitionInReverse 0.65s var(--ease-in-out-circ) both;
+    animation-name: curtainInReverse;
 }
 
 .page-transition.is-reverse.is-animating-in .page-transition__panel--dark {
-    animation: transitionInReverse 0.65s var(--ease-in-out-circ) 0.15s both;
+    animation-name: curtainInReverse;
 }
 
 .page-transition.is-reverse.is-animating-out .page-transition__panel--dark {
-    animation: transitionOutReverse 0.65s var(--ease-in-out-circ) both;
+    animation-name: curtainOutReverse;
 }
 
 .page-transition.is-reverse.is-animating-out .page-transition__panel--accent {
-    animation: transitionOutReverse 0.65s var(--ease-in-out-circ) 0.15s both;
+    animation-name: curtainOutReverse;
 }
 
-@keyframes markIn {
-    from {
+.page-transition.is-reverse.is-animating-in .page-transition__mark,
+.page-transition.is-reverse.is-animating-in .page-transition__kicker,
+.page-transition.is-reverse.is-animating-in .page-transition__word {
+    animation-name: centerInReverse;
+}
+
+.page-transition.is-reverse.is-animating-out .page-transition__center > * {
+    animation-name: centerOutReverse;
+}
+
+@keyframes curtainIn {
+    from { transform: translateX(165%); }
+    to   { transform: translateX(0); }
+}
+
+@keyframes curtainOut {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-165%); }
+}
+
+@keyframes curtainInReverse {
+    from { transform: translateX(-165%); }
+    to   { transform: translateX(0); }
+}
+
+@keyframes curtainOutReverse {
+    from { transform: translateX(0); }
+    to   { transform: translateX(165%); }
+}
+
+@keyframes centerIn {
+    from { opacity: 0; transform: translateX(70px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes centerOut {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(-90px); }
+}
+
+@keyframes centerInReverse {
+    from { opacity: 0; transform: translateX(-70px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes centerOutReverse {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(90px); }
+}
+
+@keyframes textureIn {
+    from { opacity: 0; }
+    to   { opacity: 0.05; }
+}
+
+@keyframes textureOut {
+    from { opacity: 0.05; }
+    to   { opacity: 0; }
+}
+
+/* Mouvement réduit : simple fondu sombre, pas de balayage ni de cartouche */
+@media (prefers-reduced-motion: reduce) {
+    .page-transition::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: var(--color-bg);
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.85) rotate(-15deg);
+        transition: opacity 0.25s ease;
     }
-    to {
+
+    .page-transition.is-animating-in::before {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1) rotate(0deg);
     }
-}
 
-@keyframes markOut {
-    to {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(1.15);
+    .page-transition__panel,
+    .page-transition__texture,
+    .page-transition__center > * {
+        animation: none !important;
     }
-}
-
-@keyframes transitionIn {
-    0% { clip-path: polygon(100% 0, 100% 0, 150% 100%, 150% 100%); }
-    100% { clip-path: polygon(-50% 0, 100% 0, 150% 100%, 0% 100%); }
-}
-
-@keyframes transitionOut {
-    0% { clip-path: polygon(-50% 0, 100% 0, 150% 100%, 0% 100%); }
-    100% { clip-path: polygon(-50% 0, -50% 0, 0% 100%, 0% 100%); }
-}
-
-@keyframes transitionInReverse {
-    0% { clip-path: polygon(-50% 0, -50% 0, 0% 100%, 0% 100%); }
-    100% { clip-path: polygon(-50% 0, 100% 0, 150% 100%, 0% 100%); }
-}
-
-@keyframes transitionOutReverse {
-    0% { clip-path: polygon(-50% 0, 100% 0, 150% 100%, 0% 100%); }
-    100% { clip-path: polygon(100% 0, 100% 0, 150% 100%, 150% 100%); }
 }
 
 /* ----------------------------------------

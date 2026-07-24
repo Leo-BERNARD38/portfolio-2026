@@ -746,22 +746,28 @@ function initParallax() {
    ---------------------------------------- */
 const PageTransition = {
     element: null,
-    panel: null,
+    kicker: null,
+    word: null,
     isAnimating: false,
-    
+
     init() {
         this.element = document.querySelector('.page-transition');
-        this.panel = document.querySelector('.page-transition__panel');
+        this.kicker = document.querySelector('.page-transition__kicker');
+        this.word = document.querySelector('.page-transition__word');
     },
-    
-    animate(callback, reverse = false) {
+
+    // label : { kicker, word } — cartouche affiché pendant que l'écran est couvert
+    animate(callback, reverse = false, label = null) {
         if (this.isAnimating || !this.element) {
             if (callback) callback();
             return;
         }
-        
+
         this.isAnimating = true;
-        
+
+        if (this.kicker) this.kicker.textContent = label?.kicker || '';
+        if (this.word) this.word.textContent = label?.word || '';
+
         if (reverse) {
             this.element.classList.add('is-reverse');
         } else {
@@ -1164,14 +1170,14 @@ function initProjectModal() {
 
             modal.classList.add('active');
             document.body.classList.add('modal-open');
-        });
+        }, false, { kicker: `Étude de cas — № ${project.number}`, word: project.title });
     }
 
     function closeModal() {
         PageTransition.animate(() => {
             modal.classList.remove('active');
             document.body.classList.remove('modal-open');
-        }, true);
+        }, true, { kicker: 'Retour au sommaire', word: 'Léo Bernard' });
     }
 
     function goToProject(index) {

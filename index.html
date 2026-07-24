@@ -226,19 +226,24 @@
         </div>
     </div>
 
-    <!-- Page Transition Overlay - double rideau + monogramme -->
+    <!-- Page Transition Overlay - double rideau incliné + cartouche éditorial -->
     <div class="page-transition">
         <div class="page-transition__panel page-transition__panel--accent"></div>
         <div class="page-transition__panel page-transition__panel--dark"></div>
-        <div class="page-transition__mark" aria-hidden="true">
-            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g transform="translate(50 50)" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" />
-                    <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(90)" />
-                    <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(180)" />
-                    <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(270)" />
-                </g>
-            </svg>
+        <div class="page-transition__texture"></div>
+        <div class="page-transition__center" aria-hidden="true">
+            <div class="page-transition__mark">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g transform="translate(50 50)" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" />
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(90)" />
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(180)" />
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(270)" />
+                    </g>
+                </svg>
+            </div>
+            <p class="page-transition__kicker mono-text"></p>
+            <p class="page-transition__word"></p>
         </div>
     </div>
 
