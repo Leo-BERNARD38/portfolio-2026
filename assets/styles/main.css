@@ -316,17 +316,40 @@ em {
 }
 
 .nav__logo {
+    display: block;
     width: 32px;
     height: 32px;
-    object-fit: contain;
+    /* Le stroke est piloté par CSS (SVG inline) pour rester visible sur
+       les sections colorées — cf. .header.is-on-* plus bas */
+    stroke: var(--color-accent);
+    transition: stroke 0.5s var(--ease-out-expo);
 }
 
 .nav__name {
     font-size: var(--text-sm);
     font-weight: 600;
     white-space: nowrap;
-    /* Reste lisible sur la section papier de l'à-propos */
-    mix-blend-mode: difference;
+    color: var(--color-white);
+    transition: color 0.5s var(--ease-out-expo);
+}
+
+/* Adaptation de la marque au fond survolé par la barre (piloté en JS via
+   IntersectionObserver). Seul le paint change, jamais le layout. */
+.header.is-on-light .nav__name {
+    /* Section « à propos » : fond papier clair -> encre sombre lisible */
+    color: #12131a;
+}
+
+.header.is-on-accent .nav__logo {
+    /* Section « recommandation » : fond orange -> logo blanc lisible */
+    stroke: var(--color-white);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nav__logo,
+    .nav__name {
+        transition: none;
+    }
 }
 
 /* Hero Spacer to push content down */

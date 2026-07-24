@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     PageTransition.init();
     initSmoothScroll();
     initNavigation();
+    initNavContrast();
     initFullscreenMenu();
     initCustomCursor(isTouchDevice);
     initAmbientCanvas(prefersReducedMotion);
@@ -675,6 +676,57 @@ function initNavigation() {
     }, { rootMargin: '-25% 0px -55% 0px' });
 
     sections.forEach(section => io.observe(section));
+}
+
+/* ----------------------------------------
+   Nav Contrast - lisibilité de la marque
+   La barre est fixe et transparente : le nom (blanc) et le logo (orange)
+   deviennent illisibles sur certaines sections. On bascule une classe sur
+   le header quand la marque survole une section « claire » (à propos) ou
+   « accent » (recommandation) ; la couleur est ensuite reprise en fondu
+   par une transition CSS. Aucun listener de scroll, aucun rAF : la
+   détection repose sur un IntersectionObserver dont la racine est réduite
+   à une fine bande alignée sur le logo.
+   ---------------------------------------- */
+function initNavContrast() {
+    const header = document.querySelector('.header');
+    const brand = header && header.querySelector('.nav__brand');
+    if (!header || !brand) return;
+
+    // Chaque zone impose une couleur de marque tant qu'elle passe sous la barre
+    const zones = [
+        { el: document.getElementById('about'), cls: 'is-on-light' },
+        { el: document.querySelector('.testimonials'), cls: 'is-on-accent' }
+    ].filter(z => z.el);
+    if (!zones.length) return;
+
+    const state = new Map();
+    let io = null;
+
+    const apply = () => {
+        zones.forEach(z => header.classList.toggle(z.cls, state.get(z.el) === true));
+    };
+
+    const build = () => {
+        if (io) io.disconnect();
+        // La marque est fixe : son rect est stable. On réduit la racine de
+        // l'observer à sa bande verticale -> une zone « intersecte » exactement
+        // quand elle se trouve sous le logo/nom.
+        const r = brand.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const rootMargin =
+            `${-Math.round(r.top)}px 0px ${-Math.round(vh - r.bottom)}px 0px`;
+        io = new IntersectionObserver((entries) => {
+            entries.forEach(e => state.set(e.target, e.isIntersecting));
+            apply();
+        }, { rootMargin, threshold: 0 });
+        zones.forEach(z => io.observe(z.el));
+    };
+
+    build();
+    // La hauteur du viewport bouge (barre d'adresse mobile, rotation) :
+    // on recale la bande de détection, throttlé à une fois par frame.
+    window.addEventListener('resize', rafThrottle(build), { passive: true });
 }
 
 /* ----------------------------------------
