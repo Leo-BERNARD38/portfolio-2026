@@ -458,9 +458,15 @@ function initLoader() {
         }, remainingTime);
     };
     
-    window.addEventListener('load', () => {
-        hideLoader();
-    });
+    // Le rideau ne se lève que quand la page ET les fonts sont prêtes :
+    // le hero apparaît avec sa typographie définitive, sans swap visible
+    Promise.all([
+        new Promise(resolve => {
+            if (document.readyState === 'complete') resolve();
+            else window.addEventListener('load', resolve, { once: true });
+        }),
+        document.fonts ? document.fonts.ready : Promise.resolve()
+    ]).then(hideLoader);
     
     // Fallback
     setTimeout(() => {

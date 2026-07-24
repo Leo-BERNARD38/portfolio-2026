@@ -6,15 +6,53 @@
     <title>Léo BERNARD - Web Developer & UX-UI Designer</title>
     <meta name="description" content="Portfolio de Léo BERNARD. Développeur web et designer UX/UI basé à Saint-Étienne. Création d'expériences digitales centrées sur l'humain.">
     
+    <meta name="theme-color" content="#0a0a0a">
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
-    
-    <!-- Fonts Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
+
+    <!-- Fonts auto-hébergées (variables, sous-ensemble latin) : préchargées
+         pour que la typo du loader soit là dès la première peinture -->
+    <link rel="preload" href="assets/fonts/Outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/PlayfairDisplay-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/PlayfairDisplay-Italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/JetBrainsMono-latin.woff2" as="font" type="font/woff2" crossorigin>
+
     <!-- Critical Loader Styles -->
     <style>
+        @font-face {
+            font-family: 'Outfit';
+            font-style: normal;
+            font-weight: 300 700;
+            font-display: swap;
+            src: url('assets/fonts/Outfit-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Playfair Display';
+            font-style: normal;
+            font-weight: 400 700;
+            font-display: swap;
+            src: url('assets/fonts/PlayfairDisplay-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Playfair Display';
+            font-style: italic;
+            font-weight: 400 700;
+            font-display: swap;
+            src: url('assets/fonts/PlayfairDisplay-Italic-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 400 500;
+            font-display: swap;
+            src: url('assets/fonts/JetBrainsMono-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
         :root {
             --color-bg: #0a0a0a;
             --color-white: #ffffff;
@@ -183,10 +221,8 @@
         }
     </style>
     <!-- Non-critical CSS (Loaded asynchronously) -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="assets/styles/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="assets/styles/main.css">
     </noscript>
 
