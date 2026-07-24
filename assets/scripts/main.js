@@ -999,6 +999,9 @@ function initProjectModal() {
         frame.className = 'pm-figure__frame';
         const img = document.createElement('img');
         img.src = src;
+        // Variante 960px générée pour chaque figure (mobile : moitié du poids à décoder)
+        img.srcset = `${src.replace('.webp', '-960.webp')} 960w, ${src} 1920w`;
+        img.sizes = '(max-width: 1240px) 100vw, 1160px';
         img.alt = alt;
         img.loading = 'lazy';
         img.decoding = 'async';
