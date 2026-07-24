@@ -312,8 +312,15 @@
     <!-- Header -->
     <header class="header">
         <nav class="nav">
-            <a href="index.html" class="nav__brand">
-                <img src="assets/images/logo.svg" alt="Léo Bernard" class="nav__logo">
+            <a href="index.html" class="nav__brand" aria-label="Léo Bernard — accueil">
+                <svg class="nav__logo" viewBox="0 0 100 100" fill="none" aria-hidden="true" focusable="false">
+                    <g transform="translate(50 50)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" />
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(90)" />
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(180)" />
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(270)" />
+                    </g>
+                </svg>
                 <span class="nav__name mono-text">Léo Bernard</span>
             </a>
             <ul class="nav__links">
