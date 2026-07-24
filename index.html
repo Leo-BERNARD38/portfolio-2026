@@ -6,15 +6,53 @@
     <title>Léo BERNARD - Web Developer & UX-UI Designer</title>
     <meta name="description" content="Portfolio de Léo BERNARD. Développeur web et designer UX/UI basé à Saint-Étienne. Création d'expériences digitales centrées sur l'humain.">
     
+    <meta name="theme-color" content="#0a0a0a">
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
-    
-    <!-- Fonts Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
+
+    <!-- Fonts auto-hébergées (variables, sous-ensemble latin) : préchargées
+         pour que la typo du loader soit là dès la première peinture -->
+    <link rel="preload" href="assets/fonts/Outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/PlayfairDisplay-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/PlayfairDisplay-Italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/JetBrainsMono-latin.woff2" as="font" type="font/woff2" crossorigin>
+
     <!-- Critical Loader Styles -->
     <style>
+        @font-face {
+            font-family: 'Outfit';
+            font-style: normal;
+            font-weight: 300 700;
+            font-display: swap;
+            src: url('assets/fonts/Outfit-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Playfair Display';
+            font-style: normal;
+            font-weight: 400 700;
+            font-display: swap;
+            src: url('assets/fonts/PlayfairDisplay-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Playfair Display';
+            font-style: italic;
+            font-weight: 400 700;
+            font-display: swap;
+            src: url('assets/fonts/PlayfairDisplay-Italic-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 400 500;
+            font-display: swap;
+            src: url('assets/fonts/JetBrainsMono-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
         :root {
             --color-bg: #0a0a0a;
             --color-white: #ffffff;
@@ -127,10 +165,11 @@
             overflow: hidden;
         }
         .loader__progress-bar {
-            width: 0%;
+            width: 100%;
             height: 100%;
             background-color: var(--color-bg);
-            transition: width 0.1s ease-out;
+            transform: scaleX(0);
+            transform-origin: left;
         }
         .loader__name {
             font-family: var(--font-body);
@@ -182,10 +221,8 @@
         }
     </style>
     <!-- Non-critical CSS (Loaded asynchronously) -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="assets/styles/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="assets/styles/main.css">
     </noscript>
 
@@ -408,7 +445,7 @@
             <article class="bento-item bento-item--large" data-project="optiwits" tabindex="0" role="button" aria-label="Voir le projet OptiWITS">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/optiwits.webp" alt="OptiWITS" loading="lazy">
+                        <img src="assets/images/optiwits.webp" srcset="assets/images/optiwits-800.webp 800w, assets/images/optiwits.webp 1400w" sizes="(max-width: 1024px) 100vw, 58vw" alt="OptiWITS" width="1400" height="1400" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">01</span>
                         <div class="bento-item__arrow">
@@ -434,7 +471,7 @@
             <article class="bento-item bento-item--medium" data-project="ccp" tabindex="0" role="button" aria-label="Voir le projet Camping-Car Partner">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/ccp.webp" alt="Camping-Car Partner" loading="lazy">
+                        <img src="assets/images/ccp.webp" srcset="assets/images/ccp-800.webp 800w, assets/images/ccp.webp 1600w" sizes="(max-width: 1024px) 100vw, 42vw" alt="Camping-Car Partner" width="1600" height="893" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">02</span>
                         <div class="bento-item__arrow">
@@ -460,7 +497,7 @@
             <article class="bento-item bento-item--medium" data-project="modnation" tabindex="0" role="button" aria-label="Voir le projet ModNation">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/modnation.webp" alt="ModNation" loading="lazy">
+                        <img src="assets/images/modnation.webp" srcset="assets/images/modnation-800.webp 800w, assets/images/modnation.webp 1600w" sizes="(max-width: 1024px) 100vw, 42vw" alt="ModNation" width="1600" height="893" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">03</span>
                         <div class="bento-item__arrow">
@@ -486,7 +523,7 @@
             <article class="bento-item bento-item--small" data-project="portfolio" tabindex="0" role="button" aria-label="Voir le projet Portfolio 2025">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/portfolio.webp" alt="Portfolio" loading="lazy">
+                        <img src="assets/images/portfolio.webp" srcset="assets/images/portfolio-800.webp 800w, assets/images/portfolio.webp 1400w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" alt="Portfolio" width="1400" height="1400" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">04</span>
                         <div class="bento-item__arrow">
@@ -506,7 +543,7 @@
             <article class="bento-item bento-item--small" data-project="secret" tabindex="0" role="button" aria-label="Voir le projet secret">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/secret.webp" alt="Secret Project" loading="lazy">
+                        <img src="assets/images/secret.webp" srcset="assets/images/secret-800.webp 800w, assets/images/secret.webp 1400w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" alt="Secret Project" width="1400" height="1400" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">05</span>
                         <div class="bento-item__arrow">
@@ -526,7 +563,7 @@
             <article class="bento-item bento-item--wide" data-project="youtube" tabindex="0" role="button" aria-label="Voir le projet YouTube @WNT">
                 <div class="bento-item__link">
                     <div class="bento-item__image">
-                        <img src="assets/images/youtube.webp" alt="YouTube @WNT" loading="lazy">
+                        <img src="assets/images/youtube.webp" srcset="assets/images/youtube-800.webp 800w, assets/images/youtube.webp 1800w" sizes="(max-width: 1024px) 100vw, 50vw" alt="YouTube @WNT" width="1800" height="764" loading="lazy" decoding="async">
                         <div class="bento-item__overlay"></div>
                         <span class="bento-item__num mono-text">06</span>
                         <div class="bento-item__arrow">
@@ -555,7 +592,7 @@
         <div class="about__grid">
             <div class="about__image-col">
                 <div class="about__image-wrapper reveal-img">
-                    <img src="assets/images/profil.webp" alt="Léo BERNARD" class="about__img" data-parallax-img>
+                    <img src="assets/images/profil.webp" srcset="assets/images/profil-800.webp 600w, assets/images/profil.webp 1200w" sizes="(max-width: 768px) 100vw, 42vw" alt="Léo BERNARD" class="about__img" width="1200" height="1600" loading="lazy" decoding="async" data-parallax-img>
                 </div>
 
             </div>

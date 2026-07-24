@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
                           navigator.maxTouchPoints > 0;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    FluidScroll.init(isTouchDevice, prefersReducedMotion);
     initAmbientCanvas(prefersReducedMotion);
     initCustomCursor(isTouchDevice);
     initSmoothScroll();
@@ -22,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initRevealAnimations();
     PageTransition.init();
     initProjectModal();
-    initParallax();
     initImageParallax(prefersReducedMotion);
     initTitleReveal(prefersReducedMotion);
     initScrollFX(prefersReducedMotion);
@@ -31,7 +29,27 @@ document.addEventListener('DOMContentLoaded', () => {
     initBentoGlow(isTouchDevice);
     initLightbox();
     initServicesCarousel();
+    initAnimationPause();
 });
+
+/* ----------------------------------------
+   Animations décoratives infinies (marquee,
+   étoile, pulses…) mises en pause quand
+   l'élément sort du viewport
+   ---------------------------------------- */
+function initAnimationPause() {
+    const els = document.querySelectorAll(
+        '.marquee, .spin-star, .hero__scroll-line, .about__badge-dot, .contact__status-dot'
+    );
+    if (!els.length) return;
+
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            entry.target.classList.toggle('anim-paused', !entry.isIntersecting);
+        });
+    });
+    els.forEach(el => io.observe(el));
+}
 
 /* ----------------------------------------
    Title Reveal - mot à mot
@@ -95,98 +113,102 @@ function initTitleReveal(prefersReducedMotion) {
 function initScrollFX(prefersReducedMotion) {
     const bar = document.querySelector('.scroll-progress');
     const marquee = document.querySelector('.marquee');
-    if (!bar && !marquee) return;
+    const heroBgText = document.querySelector('.hero__bg-text');
+    if (!bar && !marquee && !heroBgText) return;
+
+    let max = 1;
+    const measure = () => {
+        max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
 
     let lastY = window.scrollY;
+    let lastProgress = -1;
     let skew = 0;
 
-    const loop = () => {
-        const y = window.scrollY;
+    Ticker.add({
+        write() {
+            const y = window.scrollY;
+            let active = y !== lastY;
 
-        if (bar) {
-            const max = document.documentElement.scrollHeight - window.innerHeight;
-            bar.style.transform = `scaleX(${max > 0 ? (y / max).toFixed(4) : 0})`;
+            if (bar) {
+                const p = +(y / max).toFixed(4);
+                if (p !== lastProgress) {
+                    bar.style.transform = `scaleX(${p})`;
+                    lastProgress = p;
+                }
+            }
+
+            if (marquee && !prefersReducedMotion) {
+                const target = Math.max(-6, Math.min(6, (y - lastY) * 0.35));
+                skew += (target - skew) * 0.1;
+                if (Math.abs(skew) < 0.02 && target === 0) skew = 0;
+                else active = true;
+                marquee.style.transform = `rotate(-1.2deg) skewX(${skew.toFixed(2)}deg)`;
+            }
+
+            if (heroBgText && !prefersReducedMotion && y < window.innerHeight) {
+                heroBgText.style.transform = `translate(-50%, calc(-50% + ${(y * 0.3).toFixed(1)}px))`;
+            }
+
+            lastY = y;
+            return active ? true : false;
         }
-
-        if (marquee && !prefersReducedMotion) {
-            const velocity = y - lastY;
-            const target = Math.max(-6, Math.min(6, velocity * 0.35));
-            skew += (target - skew) * 0.1;
-            marquee.style.transform = `rotate(-1.2deg) skewX(${skew.toFixed(2)}deg)`;
-        }
-
-        lastY = y;
-        requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
+    });
+    Ticker.wake();
 }
 
 /* ----------------------------------------
-   Fluid Scroll (inertie façon Lenis, sans lib)
-   Desktop uniquement - le scroll natif reste
-   maître sur tactile et clavier.
+   Ticker unifié — une seule boucle rAF pour
+   tous les effets. Phase lecture (layout)
+   puis phase écriture (styles), jamais
+   entrelacées. S'endort quand tous les
+   abonnés sont stabilisés ; réveillé par
+   les événements (scroll, mousemove, IO).
    ---------------------------------------- */
-const FluidScroll = {
-    active: false,
-    target: 0,
-    current: 0,
-    raf: null,
-    ease: 0.09,
+const Ticker = {
+    subs: [],
+    rafId: null,
 
-    init(isTouchDevice, prefersReducedMotion) {
-        if (isTouchDevice || prefersReducedMotion) return;
-        this.active = true;
-        this.target = this.current = window.scrollY;
-
-        window.addEventListener('wheel', (e) => {
-            if (e.ctrlKey) return; // zoom navigateur
-            if (document.body.classList.contains('modal-open') ||
-                document.body.classList.contains('menu-open') ||
-                document.body.classList.contains('loading')) return;
-            if (e.target.closest('.project-modal, .lightbox, .fullscreen-menu')) return;
-
-            e.preventDefault();
-            const delta = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
-            const max = document.documentElement.scrollHeight - window.innerHeight;
-            this.target = Math.max(0, Math.min(this.target + delta, max));
-            this.start();
-        }, { passive: false });
-
-        // Resynchronise après un scroll natif (clavier, scrollbar, ancres)
-        window.addEventListener('scroll', () => {
-            if (!this.raf) {
-                this.target = this.current = window.scrollY;
-            }
-        }, { passive: true });
+    // sub : { read?(), write() -> false quand stabilisé }
+    add(sub) {
+        this.subs.push(sub);
+        return sub;
     },
 
-    start() {
-        if (!this.raf) this.raf = requestAnimationFrame(() => this.loop());
+    wake() {
+        if (!Ticker.rafId) Ticker.rafId = requestAnimationFrame(Ticker.frame);
     },
 
-    loop() {
-        const diff = this.target - this.current;
-        this.current += diff * this.ease;
-        if (Math.abs(diff) < 0.5) this.current = this.target;
-        window.scrollTo(0, this.current);
-
-        if (this.current === this.target) {
-            this.raf = null;
-            return;
-        }
-        this.raf = requestAnimationFrame(() => this.loop());
-    },
-
-    to(y) {
-        if (!this.active) {
-            window.scrollTo({ top: y, behavior: 'smooth' });
-            return;
-        }
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        this.target = Math.max(0, Math.min(y, max));
-        this.start();
+    frame() {
+        Ticker.rafId = null;
+        let active = false;
+        for (const s of Ticker.subs) if (s.read) s.read();
+        for (const s of Ticker.subs) if (s.write() !== false) active = true;
+        if (active) Ticker.rafId = requestAnimationFrame(Ticker.frame);
     }
 };
+
+window.addEventListener('scroll', Ticker.wake, { passive: true });
+window.addEventListener('resize', Ticker.wake, { passive: true });
+
+// Borne un handler à une exécution par frame (les événements souris
+// peuvent dépasser 60/s) — la dernière valeur reçue gagne
+function rafThrottle(fn) {
+    let pending = false;
+    let lastArgs = null;
+    return function (...args) {
+        lastArgs = args;
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {
+            pending = false;
+            fn.apply(this, lastArgs);
+        });
+    };
+}
 
 /* ----------------------------------------
    Ambient Canvas
@@ -237,18 +259,24 @@ function initAmbientCanvas(prefersReducedMotion) {
     }
 
     let t = 0;
-    let visible = !document.hidden;
+    let raf = null;
+
+    const frame = () => {
+        t += 0.0035;
+        draw(t);
+        raf = requestAnimationFrame(frame);
+    };
+
     document.addEventListener('visibilitychange', () => {
-        visible = !document.hidden;
+        if (document.hidden) {
+            cancelAnimationFrame(raf);
+            raf = null;
+        } else if (!raf) {
+            raf = requestAnimationFrame(frame);
+        }
     });
 
-    (function frame() {
-        if (visible) {
-            t += 0.0035;
-            draw(t);
-        }
-        requestAnimationFrame(frame);
-    })();
+    raf = requestAnimationFrame(frame);
 }
 
 /* ----------------------------------------
@@ -268,24 +296,46 @@ function initImageParallax(prefersReducedMotion) {
     const items = Array.from(imgs).map(img => ({
         img,
         wrap: img.parentElement,
-        y: 0
+        y: 0,
+        visible: false,
+        rect: null
     }));
 
-    const update = () => {
-        const vh = window.innerHeight;
-        for (const it of items) {
-            const rect = it.wrap.getBoundingClientRect();
-            if (rect.bottom < -100 || rect.top > vh + 100) continue;
+    // Le rect n'est mesuré que lorsque le conteneur est à l'écran,
+    // et uniquement en phase lecture (pas de reflow forcé)
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const it = items.find(i => i.wrap === entry.target);
+            if (it) it.visible = entry.isIntersecting;
+        });
+        Ticker.wake();
+    }, { rootMargin: '100px 0px' });
+    items.forEach(it => io.observe(it.wrap));
 
-            // Progression -1 (sous le viewport) -> 1 (au-dessus)
-            const progress = (rect.top + rect.height / 2 - vh / 2) / (vh / 2 + rect.height / 2);
-            const target = -progress * rect.height * 0.07;
-            it.y += (target - it.y) * 0.12;
-            it.img.style.transform = `translate3d(0, ${it.y.toFixed(2)}px, 0) scale(1.14)`;
+    Ticker.add({
+        read() {
+            for (const it of items) {
+                it.rect = it.visible ? it.wrap.getBoundingClientRect() : null;
+            }
+        },
+        write() {
+            const vh = window.innerHeight;
+            let active = false;
+            for (const it of items) {
+                if (!it.rect) continue;
+                const rect = it.rect;
+
+                // Progression -1 (sous le viewport) -> 1 (au-dessus)
+                const progress = (rect.top + rect.height / 2 - vh / 2) / (vh / 2 + rect.height / 2);
+                const target = -progress * rect.height * 0.07;
+                it.y += (target - it.y) * 0.12;
+                if (Math.abs(target - it.y) < 0.05) it.y = target;
+                else active = true;
+                it.img.style.transform = `translate3d(0, ${it.y.toFixed(2)}px, 0) scale(1.14)`;
+            }
+            return active ? true : false;
         }
-        requestAnimationFrame(update);
-    };
-    requestAnimationFrame(update);
+    });
 }
 
 /* ----------------------------------------
@@ -297,23 +347,21 @@ function initBentoGlow(isTouchDevice) {
     const bentoItems = document.querySelectorAll('.bento-item');
 
     bentoItems.forEach(item => {
-        item.addEventListener('mousemove', (e) => {
+        item.addEventListener('mousemove', rafThrottle((e) => {
             const rect = item.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
 
             item.style.setProperty('--mouse-x', `${x}%`);
             item.style.setProperty('--mouse-y', `${y}%`);
-        });
+        }), { passive: true });
 
         item.addEventListener('mouseenter', function() {
             this.style.zIndex = '10';
         });
 
         item.addEventListener('mouseleave', function() {
-            setTimeout(() => {
-                this.style.zIndex = '1';
-            }, 300);
+            this.style.zIndex = '1';
         });
     });
 }
@@ -330,7 +378,7 @@ function initLoader() {
     const progressBar = loader.querySelector('.loader__progress-bar');
     const percentText = loader.querySelector('.loader__percent');
     
-    const MIN_LOADER_TIME = 1800;
+    const MIN_LOADER_TIME = 1000;
     const loaderStartTime = Date.now();
     let progress = 0;
     let targetProgress = 0;
@@ -348,7 +396,7 @@ function initLoader() {
         progress += diff * factor;
         
         const displayProgress = Math.min(Math.round(progress), 100);
-        if (progressBar) progressBar.style.width = `${progress}%`;
+        if (progressBar) progressBar.style.transform = `scaleX(${(progress / 100).toFixed(4)})`;
         if (percentText) percentText.textContent = `${displayProgress}%`;
         
         if (Math.abs(diff) > 0.05) {
@@ -410,16 +458,22 @@ function initLoader() {
         }, remainingTime);
     };
     
-    window.addEventListener('load', () => {
-        hideLoader();
-    });
+    // Le rideau ne se lève que quand la page ET les fonts sont prêtes :
+    // le hero apparaît avec sa typographie définitive, sans swap visible
+    Promise.all([
+        new Promise(resolve => {
+            if (document.readyState === 'complete') resolve();
+            else window.addEventListener('load', resolve, { once: true });
+        }),
+        document.fonts ? document.fonts.ready : Promise.resolve()
+    ]).then(hideLoader);
     
     // Fallback
     setTimeout(() => {
         if (!loader.classList.contains('loaded')) {
             hideLoader();
         }
-    }, 8000);
+    }, 5000);
 }
 
 /* ----------------------------------------
@@ -456,35 +510,38 @@ function initCustomCursor(isTouchDevice) {
         return;
     }
     
-    let mouseX = 0;
-    let mouseY = 0;
-    let cursorX = 0;
-    let cursorY = 0;
-    let followerX = 0;
-    let followerY = 0;
-    
+    let mouseX = -100;
+    let mouseY = -100;
+    let fx = -100;
+    let fy = -100;
+    let hasMoved = false;
+
     document.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
+        hasMoved = true;
+        Ticker.wake();
+    }, { passive: true });
+
+    Ticker.add({
+        write() {
+            if (!hasMoved) return false;
+
+            // Point : collé au pointeur, zéro latence
+            cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+
+            // Anneau : traîne courte, s'endort une fois convergé
+            fx += (mouseX - fx) * 0.22;
+            fy += (mouseY - fy) * 0.22;
+            const settled = Math.abs(mouseX - fx) < 0.3 && Math.abs(mouseY - fy) < 0.3;
+            if (settled) {
+                fx = mouseX;
+                fy = mouseY;
+            }
+            follower.style.transform = `translate3d(${fx.toFixed(1)}px, ${fy.toFixed(1)}px, 0)`;
+            if (settled) return false;
+        }
     });
-    
-    function animateCursor() {
-        // Cursor with slight smoothing
-        cursorX += (mouseX - cursorX) * 0.3;
-        cursorY += (mouseY - cursorY) * 0.3;
-        cursor.style.left = `${cursorX}px`;
-        cursor.style.top = `${cursorY}px`;
-        
-        // Follower with more delay
-        followerX += (mouseX - followerX) * 0.1;
-        followerY += (mouseY - followerY) * 0.1;
-        follower.style.left = `${followerX}px`;
-        follower.style.top = `${followerY}px`;
-        
-        requestAnimationFrame(animateCursor);
-    }
-    
-    animateCursor();
     
     // Interactive elements
     const interactiveElements = document.querySelectorAll('a, button, .bento-item, [data-cursor="hover"]');
@@ -519,9 +576,6 @@ function initCustomCursor(isTouchDevice) {
 function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            
             // Close mobile menu if open
             const menu = document.querySelector('.fullscreen-menu');
             const menuBtn = document.querySelector('.nav__menu-btn');
@@ -530,20 +584,12 @@ function initSmoothScroll() {
                 menuBtn?.classList.remove('active');
                 document.body.classList.remove('menu-open');
             }
-            
-            // Si c'est juste "#", retour en haut
-            if (targetId === '#') {
-                FluidScroll.to(0);
-                return;
-            }
 
-            const target = document.querySelector(targetId);
-            if (target) {
-                const headerOffset = 0;
-                const elementPosition = target.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                FluidScroll.to(offsetPosition);
+            // Si c'est juste "#", retour en haut ; sinon navigation
+            // native (scroll-behavior: smooth défini en CSS)
+            if (this.getAttribute('href') === '#') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
     });
@@ -553,49 +599,34 @@ function initSmoothScroll() {
    Navigation
    ---------------------------------------- */
 function initNavigation() {
-    const header = document.querySelector('.header');
     const navLinks = document.querySelectorAll('.nav__link:not(.nav__link--cta)');
     const sections = document.querySelectorAll('section[id]');
-    let lastScroll = 0;
-    let ticking = false;
-    
-    // Active link based on scroll position
-    function updateActiveLink() {
-        const scrollY = window.pageYOffset;
-        
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop - 150;
-            const sectionHeight = section.offsetHeight;
-            const sectionId = section.getAttribute('id');
-            
-            if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${sectionId}`) {
-                        link.classList.add('active');
-                    }
-                });
-            }
+    if (!navLinks.length || !sections.length) return;
+
+    const visible = new Set();
+
+    // Bande "active" ≈ tiers haut du viewport ; aucune section dans
+    // la bande (haut du hero) -> aucun lien actif
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) visible.add(entry.target.id);
+            else visible.delete(entry.target.id);
         });
-        
-        // Remove active if at top (hero)
-        if (scrollY < 300) {
-            navLinks.forEach(link => link.classList.remove('active'));
+
+        let current = null;
+        for (const section of sections) {
+            if (visible.has(section.id)) {
+                current = section.id;
+                break;
+            }
         }
-    }
-    
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            requestAnimationFrame(() => {
-                updateActiveLink();
-                ticking = false;
-            });
-            ticking = true;
-        }
-    });
-    
-    // Initial check
-    updateActiveLink();
+
+        navLinks.forEach(link => {
+            link.classList.toggle('active', current !== null && link.getAttribute('href') === `#${current}`);
+        });
+    }, { rootMargin: '-25% 0px -55% 0px' });
+
+    sections.forEach(section => io.observe(section));
 }
 
 /* ----------------------------------------
@@ -709,39 +740,6 @@ function initRevealAnimations() {
 }
 
 /* ----------------------------------------
-   Parallax Effects
-   ---------------------------------------- */
-function initParallax() {
-    const parallaxElements = document.querySelectorAll('[data-parallax]');
-    const heroBgText = document.querySelector('.hero__bg-text');
-    
-    let ticking = false;
-    
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            requestAnimationFrame(() => {
-                const scrolled = window.pageYOffset;
-                
-                // Hero background text parallax
-                if (heroBgText) {
-                    heroBgText.style.transform = `translate(-50%, calc(-50% + ${scrolled * 0.3}px))`;
-                }
-                
-                // Generic parallax elements
-                parallaxElements.forEach(el => {
-                    const speed = el.dataset.parallax || 0.5;
-                    const yPos = scrolled * speed;
-                    el.style.transform = `translateY(${yPos}px)`;
-                });
-                
-                ticking = false;
-            });
-            ticking = true;
-        }
-    });
-}
-
-/* ----------------------------------------
    Page Transition Manager
    ---------------------------------------- */
 const PageTransition = {
@@ -749,6 +747,8 @@ const PageTransition = {
     kicker: null,
     word: null,
     isAnimating: false,
+    COVER_MS: 720,  // durée réelle de curtainIn (0.72s)
+    OUT_MS: 820,    // curtainOut 0.72s + délai 0.09s + marge
 
     init() {
         this.element = document.querySelector('.page-transition');
@@ -768,33 +768,22 @@ const PageTransition = {
         if (this.kicker) this.kicker.textContent = label?.kicker || '';
         if (this.word) this.word.textContent = label?.word || '';
 
-        if (reverse) {
-            this.element.classList.add('is-reverse');
-        } else {
-            this.element.classList.remove('is-reverse');
-        }
-        
-        // Start In Animation
+        this.element.classList.toggle('is-reverse', reverse);
         this.element.classList.remove('is-animating-out');
         this.element.classList.add('is-animating-in');
-        
-        // Wait for In Animation (0.8s)
+
         setTimeout(() => {
-            // Execute callback (change content)
+            // Contenu échangé pendant que l'écran est couvert
             if (callback) callback();
 
-            // Start Out Animation
             this.element.classList.remove('is-animating-in');
             this.element.classList.add('is-animating-out');
-            
-            // Reset after Out Animation (0.8s)
+
             setTimeout(() => {
-                this.element.classList.remove('is-animating-out');
-                this.element.classList.remove('is-reverse');
+                this.element.classList.remove('is-animating-out', 'is-reverse');
                 this.isAnimating = false;
-            }, 800);
-            
-        }, 800);
+            }, this.OUT_MS);
+        }, this.COVER_MS);
     }
 };
 
@@ -1010,8 +999,12 @@ function initProjectModal() {
         frame.className = 'pm-figure__frame';
         const img = document.createElement('img');
         img.src = src;
+        // Variante 960px générée pour chaque figure (mobile : moitié du poids à décoder)
+        img.srcset = `${src.replace('.webp', '-960.webp')} 960w, ${src} 1920w`;
+        img.sizes = '(max-width: 1240px) 100vw, 1160px';
         img.alt = alt;
         img.loading = 'lazy';
+        img.decoding = 'async';
         const overlay = document.createElement('div');
         overlay.className = 'pm-figure__overlay';
         frame.appendChild(img);
@@ -1306,14 +1299,14 @@ function initServiceCardsGlow(isTouchDevice) {
     const cards = document.querySelectorAll('.service-card');
     
     cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
+        card.addEventListener('mousemove', rafThrottle((e) => {
             const rect = card.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
-            
+
             card.style.setProperty('--mouse-x', `${x}%`);
             card.style.setProperty('--mouse-y', `${y}%`);
-        });
+        }), { passive: true });
     });
 }
 
@@ -1329,7 +1322,7 @@ function initButtonGlow(isTouchDevice) {
     wrappers.forEach(wrapper => {
         const btn = wrapper.querySelector('.btn');
 
-        wrapper.addEventListener('mousemove', (e) => {
+        wrapper.addEventListener('mousemove', rafThrottle((e) => {
             const rect = wrapper.getBoundingClientRect();
             // Normalize to -1 to 1 range (center = 0)
             const normalizedX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
@@ -1347,7 +1340,7 @@ function initButtonGlow(isTouchDevice) {
                 btn.style.transform =
                     `translate(${(normalizedX * 5).toFixed(1)}px, ${(normalizedY * 5).toFixed(1)}px) scale(1.02)`;
             }
-        });
+        }), { passive: true });
 
         wrapper.addEventListener('mouseleave', () => {
             // Smooth return to center
